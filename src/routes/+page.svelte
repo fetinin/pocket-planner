@@ -10,10 +10,10 @@
 					Create a <button class="is-size-6">New room</button>
 				</form>
 				<p>Or join existing</p>
-				<input type="text" bind:value={roomNumber} />
-				<a href="/room/{roomNumber}"
-					><button disabled={!roomNumber} class="is-size-6">Connect room</button></a
-				>
+				<form action="/room/{roomNumber}">
+					<input type="text" bind:value={roomNumber} />
+					<button disabled={!roomNumber} class="is-size-6">Connect room</button>
+				</form>
 			</div>
 		</div>
 	</div>
