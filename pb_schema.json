@@ -149,7 +149,7 @@
 				"name": "nickname",
 				"type": "text",
 				"system": false,
-				"required": false,
+				"required": true,
 				"unique": true,
 				"options": {
 					"min": null,

@@ -1,9 +1,17 @@
-import type { User } from '$lib/store/pb';
 import { pb } from '$lib/store/pb';
-import { adjectives, colors, uniqueNamesGenerator } from 'unique-names-generator';
+import { Collections } from '$lib/store/types';
+import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { redirect } from '@sveltejs/kit';
 
+import type {
+	RoomsRecord,
+	RoomsResponse,
+	VotersRecord,
+	VotersResponse,
+	RoomsVotersRecord,
+	RoomsVotersResponse
+} from '$lib/store/types';
 import type { Actions } from './$types';
 import type { Config } from 'unique-names-generator';
 
@@ -11,7 +19,9 @@ export const actions: Actions = {
 	createNewRoom: async ({ cookies, locals }) => {
 		let userID = cookies.get('userID');
 		if (!userID) {
-			const user = await pb.collection('voters').create<User>(<User>{ nickname: generateName() });
+			const user = await pb
+				.collection(Collections.Voters)
+				.create<VotersResponse>(<VotersRecord>{ nickname: generateName() });
 			userID = user.id.toString();
 
 			cookies.set('userID', userID, {
@@ -24,17 +34,20 @@ export const actions: Actions = {
 		}
 
 		const roomNumber = (Math.random() * 10000).toFixed(0);
-		const room = await pb.collection('rooms').create({ creator_id: userID, public_id: roomNumber });
-		await pb
-			.collection('rooms_voters')
-			.create({ room_id: room.id, voter_id: cookies.get('userID') });
+		const room = await pb
+			.collection(Collections.Rooms)
+			.create<RoomsResponse>(<RoomsRecord>{ creator_id: userID, public_id: roomNumber });
+		await pb.collection(Collections.RoomsVoters).create<RoomsVotersResponse>(<RoomsVotersRecord>{
+			room_id: room.id,
+			voter_id: cookies.get('userID')
+		});
 
 		throw redirect(303, `/room/${roomNumber}`);
 	}
 };
 
 const customConfig: Config = {
-	dictionaries: [adjectives, colors],
+	dictionaries: [adjectives, animals],
 	separator: ' ',
 	length: 2,
 	style: 'capital'

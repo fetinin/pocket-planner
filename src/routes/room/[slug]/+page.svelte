@@ -4,30 +4,31 @@
 	import { pb } from '$lib/store/pb';
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageServerData } from './$types';
+	import { Collections } from '$lib/store/types';
+	import type { RoomsVotersRecord, RoomsVotersResponse, VotersRecord } from '$lib/store/types';
+	import type { UnsubscribeFunc } from 'pocketbase';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
 
-	let unsubVoters: () => void;
+	let unsubVoters: UnsubscribeFunc;
 	onMount(async () => {
 		unsubVoters = await pb
-			.collection('rooms_voters')
-			.subscribe('*', async function ({ action, record }) {
+			.collection(Collections.RoomsVoters)
+			.subscribe<RoomsVotersRecord>('*', async function ({ action, record }) {
 				if (record.room_id !== data.room.id) {
 					return;
 				}
 
 				switch (action) {
 					case 'create':
-						const user = await pb.collection('voters').getOne(record.voter_id);
-						voters = [{ id: record.voter_id, voted: false, nickname: user.nickname }, ...voters];
-						console.log('delete user', record.voter_id);
+						const voter = await pb.collection(Collections.Voters).getOne(record.voter_id);
+						voters = [{ id: record.voter_id, voted: false, nickname: voter.nickname }, ...voters];
+						console.debug('add voter', record.voter_id);
 						break;
 					case 'delete':
-						console.log(voters);
-						console.log(record.voter_id);
 						voters = voters.filter((v) => v.id !== record.voter_id);
-						console.log('delete user', record.voter_id);
+						console.debug('delete voter', record.voter_id);
 				}
 			});
 	});
@@ -35,10 +36,10 @@
 	onDestroy(async () => {
 		if (browser) {
 			let currentRoomVoter = await pb
-				.collection('rooms_voters')
-				.getFirstListItem(`voter_id = '${data.user.id}'`);
-			pb.collection('rooms_voters').delete(currentRoomVoter.id);
-			unsubVoters();
+				.collection(Collections.RoomsVoters)
+				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${data.user.id}'`);
+			await pb.collection(Collections.RoomsVoters).delete(currentRoomVoter.id);
+			await unsubVoters();
 		}
 	});
 
