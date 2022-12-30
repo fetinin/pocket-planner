@@ -62,15 +62,16 @@
       "system": false,
       "schema": [
           {
-              "id": "t2odso5z",
-              "name": "field",
-              "type": "number",
+              "id": "2t2bmn9f",
+              "name": "creator",
+              "type": "relation",
               "system": false,
               "required": true,
-              "unique": true,
+              "unique": false,
               "options": {
-                  "min": null,
-                  "max": null
+                  "maxSelect": 1,
+                  "collectionId": "r25pd3ot3lf87e3",
+                  "cascadeDelete": true
               }
           }
       ],
@@ -121,6 +122,33 @@
               "required": false,
               "unique": false,
               "options": {}
+          }
+      ],
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
+      "options": {}
+  },
+  {
+      "id": "r25pd3ot3lf87e3",
+      "name": "voters",
+      "type": "base",
+      "system": false,
+      "schema": [
+          {
+              "id": "heobhawe",
+              "name": "nickname",
+              "type": "text",
+              "system": false,
+              "required": false,
+              "unique": true,
+              "options": {
+                  "min": null,
+                  "max": 100,
+                  "pattern": ""
+              }
           }
       ],
       "listRule": null,
