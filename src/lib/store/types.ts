@@ -47,6 +47,7 @@ export type RoomsTasksRecord<Tvotes = unknown> = {
 export type RoomsVotersRecord = {
 	voter_id: RecordIdString
 	room_id: RecordIdString
+	vote?: number
 }
 
 export type UsersRecord = {

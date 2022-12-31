@@ -196,6 +196,18 @@
 					"collectionId": "91bwt8zjwnoi4lp",
 					"cascadeDelete": true
 				}
+			},
+			{
+				"id": "0dotkdlg",
+				"name": "vote",
+				"type": "number",
+				"system": false,
+				"required": false,
+				"unique": false,
+				"options": {
+					"min": 0,
+					"max": null
+				}
 			}
 		],
 		"listRule": "",

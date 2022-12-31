@@ -3,13 +3,15 @@
 	import { page } from '$app/stores';
 	import { pb } from '$lib/store/pb';
 	import { onDestroy, onMount } from 'svelte';
-	import type { PageServerData } from './$types';
+	import type { ActionData, PageServerData } from './$types';
 	import { Collections } from '$lib/store/types';
 	import type { RoomsVotersRecord, RoomsVotersResponse, VotersRecord } from '$lib/store/types';
 	import type { UnsubscribeFunc } from 'pocketbase';
+	import { enhance } from '$app/forms';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
+	export let form: ActionData;
 
 	let unsubVoters: UnsubscribeFunc;
 	onMount(async () => {
@@ -25,6 +27,13 @@
 						const voter = await pb.collection(Collections.Voters).getOne(record.voter_id);
 						voters = [{ id: record.voter_id, voted: false, nickname: voter.nickname }, ...voters];
 						console.debug('add voter', record.voter_id);
+						break;
+					case 'update':
+						voters.map((v) => {
+							if (v.id == record.voter_id) v.voted = true;
+						});
+						voters = voters;
+						console.log(voters);
 						break;
 					case 'delete':
 						voters = voters.filter((v) => v.id !== record.voter_id);
@@ -44,10 +53,10 @@
 	});
 
 	export const numbers = [1, 3, 5, 10, 12];
-	export let chosen: Number;
+	export let chosen: number;
 
-	function vote(i: any) {
-		chosen = numbers[i];
+	async function vote(n: number) {
+		chosen = n;
 	}
 </script>
 
@@ -56,11 +65,15 @@
 		<h1>Room: {$page.params.slug}</h1>
 		<h2>Hi {data.user.nickname}</h2>
 
-		{#each numbers as n, i (n)}
-			<button class="button" class:is-active={chosen === n} on:click={() => vote(i)}
-				>{n} - {i}</button
-			>
-		{/each}
+		<form action="?/vote" method="POST" use:enhance>
+			<input type="hidden" name="vote" id="vote" value={chosen} />
+			{#each numbers as n (n)}
+				<button class="button" class:is-active={chosen === n} on:click={() => vote(n)}>{n}</button>
+			{/each}
+			{#if form?.success}
+				Voted ✅
+			{/if}
+		</form>
 
 		{#if chosen}
 			<p>You voted: {chosen}</p>

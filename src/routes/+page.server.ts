@@ -16,7 +16,7 @@ import type { Actions } from './$types';
 import type { Config } from 'unique-names-generator';
 
 export const actions: Actions = {
-	createNewRoom: async ({ cookies, locals }) => {
+	createNewRoom: async ({ cookies }) => {
 		let userID = cookies.get('userID');
 		if (!userID) {
 			const user = await pb

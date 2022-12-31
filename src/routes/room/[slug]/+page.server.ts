@@ -1,7 +1,9 @@
 import { pb } from '$lib/store/pb';
 import { Collections } from '$lib/store/types';
 
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
+
+import type { Actions } from '@sveltejs/kit';
 
 import type { User } from '$lib/store/pb';
 
@@ -53,12 +55,12 @@ export const load = (async ({ params, cookies }) => {
 
 	const roomsVotersRecords = await pb
 		.collection(Collections.RoomsVoters)
-		.getFullList<RoomsVotersResponse>(50, { filter: `room_id='${room.id}'`, expand: 'voter_id' });
+		.getFullList<RoomsVotersResponse>(20, { filter: `room_id='${room.id}'`, expand: 'voter_id' });
 
 	let voters: Voter[] = roomsVotersRecords.map((r) => {
 		return {
 			id: r.voter_id,
-			voted: false,
+			voted: Boolean(r.vote),
 			nickname: (r.expand as { voter_id: VotersRecord }).voter_id.nickname
 		};
 	});
@@ -68,7 +70,6 @@ export const load = (async ({ params, cookies }) => {
 		await pb
 			.collection(Collections.RoomsVoters)
 			.create(<RoomsVotersRecord>{ room_id: room.id, voter_id: user.id });
-		console.debug('user addet to room');
 		voters = [{ id: user.id, voted: false, nickname: user.nickname }, ...voters];
 	}
 
@@ -80,7 +81,8 @@ export const load = (async ({ params, cookies }) => {
 		},
 		user: {
 			id: user.id,
-			nickname: user.nickname
+			nickname: user.nickname,
+			isRoomAdmin: room.creator_id == user.id
 		},
 		voters
 	};
@@ -89,3 +91,30 @@ export const load = (async ({ params, cookies }) => {
 function isNumber(val: string): boolean {
 	return /^-?\d+$/.test(val);
 }
+
+export const actions: Actions = {
+	vote: async ({ request, cookies, params }) => {
+		const userID = cookies.get('userID') || '';
+		if (!userID) {
+			return fail(403);
+		}
+
+		const currentRoomVoter = await pb
+			.collection(Collections.RoomsVoters)
+			.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
+
+		const data = await request.formData();
+		const voteValue = data.get('vote');
+		if (!voteValue) {
+			return fail(400, { vote: 'missing vote' });
+		}
+
+		await pb.collection(Collections.RoomsVoters).update<RoomsVotersRecord>(currentRoomVoter.id, <
+			RoomsVotersRecord
+		>{
+			vote: parseInt(voteValue.toString())
+		});
+
+		return { success: true };
+	}
+};
