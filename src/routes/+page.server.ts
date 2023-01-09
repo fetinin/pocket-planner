@@ -37,9 +37,10 @@ export const actions: Actions = {
 		const room = await pb
 			.collection(Collections.Rooms)
 			.create<RoomsResponse>(<RoomsRecord>{ creator_id: userID, public_id: roomNumber });
+
 		await pb.collection(Collections.RoomsVoters).create<RoomsVotersResponse>(<RoomsVotersRecord>{
 			room_id: room.id,
-			voter_id: cookies.get('userID')
+			voter_id: userID
 		});
 
 		throw redirect(303, `/room/${roomNumber}`);

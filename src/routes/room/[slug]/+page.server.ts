@@ -12,12 +12,15 @@ import type {
 	RoomsResponse,
 	RoomsVotersRecord,
 	RoomsVotersResponse,
-	VotersRecord
+	VotersRecord,
+	RoomsTasksRecord,
+	RoomsTasksResponse
 } from '$lib/store/types';
 
 type Voter = {
 	id: string;
 	nickname: string;
+	vote: number | undefined;
 	voted: boolean;
 };
 
@@ -61,7 +64,8 @@ export const load = (async ({ params, cookies }) => {
 		return {
 			id: r.voter_id,
 			voted: Boolean(r.vote),
-			nickname: (r.expand as { voter_id: VotersRecord }).voter_id.nickname
+			nickname: (r.expand as { voter_id: VotersRecord }).voter_id.nickname,
+			vote: r.vote
 		};
 	});
 
@@ -70,8 +74,16 @@ export const load = (async ({ params, cookies }) => {
 		await pb
 			.collection(Collections.RoomsVoters)
 			.create(<RoomsVotersRecord>{ room_id: room.id, voter_id: user.id });
-		voters = [{ id: user.id, voted: false, nickname: user.nickname }, ...voters];
+		voters = [{ id: user.id, voted: false, nickname: user.nickname, vote: undefined }, ...voters];
 	}
+
+	const tasksRecords = await pb
+		.collection(Collections.RoomsTasks)
+		.getFullList<RoomsTasksResponse>(50, { filter: `room_id='${room.id}'` });
+
+	const tasks = tasksRecords.map((r) => {
+		return { id: r.id, description: r.description, vote: r.vote };
+	});
 
 	return {
 		room: {
@@ -84,7 +96,8 @@ export const load = (async ({ params, cookies }) => {
 			nickname: user.nickname,
 			isRoomAdmin: room.creator_id == user.id
 		},
-		voters
+		voters,
+		tasks
 	};
 }) satisfies PageServerLoad;
 
@@ -93,7 +106,7 @@ function isNumber(val: string): boolean {
 }
 
 export const actions: Actions = {
-	vote: async ({ request, cookies, params }) => {
+	vote: async ({ request, cookies }) => {
 		const userID = cookies.get('userID') || '';
 		if (!userID) {
 			return fail(403);
@@ -109,12 +122,52 @@ export const actions: Actions = {
 			return fail(400, { vote: 'missing vote' });
 		}
 
-		await pb.collection(Collections.RoomsVoters).update<RoomsVotersRecord>(currentRoomVoter.id, <
+		await pb.collection(Collections.RoomsVoters).update<RoomsVotersResponse>(currentRoomVoter.id, <
 			RoomsVotersRecord
 		>{
 			vote: parseInt(voteValue.toString())
 		});
 
+		return { success: true };
+	},
+
+	addTask: async ({ request, cookies }) => {
+		const userID = cookies.get('userID') || '';
+		if (!userID) {
+			return fail(403);
+		}
+
+		const data = await request.formData();
+		const description = data.get('content');
+		const roomID = data.get('room_id');
+
+		await pb
+			.collection(Collections.RoomsTasks)
+			.create<RoomsTasksResponse>(<RoomsTasksRecord>{ description: description, room_id: roomID });
+
+		return { success: true };
+	},
+
+	endVote: async ({ request, cookies }) => {
+		const data = await request.formData();
+		const roomID = data.get('room_id');
+		const taskID = data.get('task_id');
+		if (!taskID || !roomID) {
+			return fail(400, { error: 'room_id or task_id is missing' });
+		}
+
+		const votesRecords = await pb
+			.collection(Collections.RoomsVoters)
+			.getFullList<RoomsVotersResponse>(10, { filter: `room_id = '${roomID}'` });
+
+		const votes = votesRecords.map((r) => r.vote).filter(Number) as number[];
+		const avgScore = votes.reduce((p, c) => p + c);
+
+		await pb.collection(Collections.RoomsTasks).update(taskID.toString(), { vote: avgScore });
+
+		votesRecords.forEach(async (r) => {
+			await pb.collection(Collections.RoomsVoters).update(r.id, { vote: null });
+		});
 		return { success: true };
 	}
 };

@@ -38,10 +38,10 @@ export type RoomsRecord = {
 	public_id?: string
 }
 
-export type RoomsTasksRecord<Tvotes = unknown> = {
-	title: string
+export type RoomsTasksRecord = {
 	description: string
-	votes?: null | Tvotes
+	vote?: number
+	room_id: RecordIdString
 }
 
 export type RoomsVotersRecord = {
@@ -61,7 +61,7 @@ export type VotersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type RoomsResponse = RoomsRecord & BaseSystemFields
-export type RoomsTasksResponse<Tvotes = unknown> = RoomsTasksRecord<Tvotes> & BaseSystemFields
+export type RoomsTasksResponse = RoomsTasksRecord & BaseSystemFields
 export type RoomsVotersResponse = RoomsVotersRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 export type VotersResponse = VotersRecord & BaseSystemFields

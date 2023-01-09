@@ -96,19 +96,6 @@
 		"system": false,
 		"schema": [
 			{
-				"id": "hu0wopbj",
-				"name": "title",
-				"type": "text",
-				"system": false,
-				"required": true,
-				"unique": false,
-				"options": {
-					"min": null,
-					"max": 150,
-					"pattern": ""
-				}
-			},
-			{
 				"id": "hxdyk09f",
 				"name": "description",
 				"type": "text",
@@ -122,13 +109,29 @@
 				}
 			},
 			{
-				"id": "rtzwkwgw",
-				"name": "votes",
-				"type": "json",
+				"id": "35rmg0lw",
+				"name": "vote",
+				"type": "number",
 				"system": false,
 				"required": false,
 				"unique": false,
-				"options": {}
+				"options": {
+					"min": null,
+					"max": null
+				}
+			},
+			{
+				"id": "k5bdubd0",
+				"name": "room_id",
+				"type": "relation",
+				"system": false,
+				"required": true,
+				"unique": false,
+				"options": {
+					"maxSelect": 1,
+					"collectionId": "91bwt8zjwnoi4lp",
+					"cascadeDelete": false
+				}
 			}
 		],
 		"listRule": "",
