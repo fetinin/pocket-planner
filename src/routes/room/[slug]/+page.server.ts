@@ -5,8 +5,6 @@ import { error, fail, redirect } from '@sveltejs/kit';
 
 import type { Actions } from '@sveltejs/kit';
 
-import type { User } from '$lib/store/pb';
-
 import type { PageServerLoad } from './$types';
 import type {
 	RoomsResponse,
@@ -14,6 +12,7 @@ import type {
 	RoomsVotersResponse,
 	VotersRecord,
 	RoomsTasksRecord,
+	VotersResponse,
 	RoomsTasksResponse
 } from '$lib/store/types';
 
@@ -38,7 +37,7 @@ export const load = (async ({ params, cookies }) => {
 	}
 
 	try {
-		var user = await pb.collection(Collections.Voters).getOne<User>(userID);
+		var user = await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
 	} catch (err) {
 		console.error('voter not found, invalid user id', err);
 		cookies.delete('userID');
@@ -76,6 +75,13 @@ export const load = (async ({ params, cookies }) => {
 			.create(<RoomsVotersRecord>{ room_id: room.id, voter_id: user.id });
 		voters = [{ id: user.id, voted: false, nickname: user.nickname, vote: undefined }, ...voters];
 	}
+	voters = [
+		{ id: '1', voted: false, nickname: 'Grey Salmon', vote: undefined },
+		{ id: '2', voted: false, nickname: 'Funny Rabbit', vote: undefined },
+		{ id: '3', voted: false, nickname: 'Happy Rainbow', vote: undefined },
+		{ id: '4', voted: false, nickname: 'Smily Dear', vote: undefined },
+		...voters
+	];
 
 	const tasksRecords = await pb
 		.collection(Collections.RoomsTasks)

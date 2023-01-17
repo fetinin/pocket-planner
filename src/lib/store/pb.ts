@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
 import PocketBase from 'pocketbase';
 
-const url = browser ? 'http://127.0.0.1:8090' : 'http://127.0.0.1:8090';
+const url = browser ? 'https://pocker-pocket-db.fly.dev' : 'https://pocker-pocket-db.fly.dev/';
 export const pb = new PocketBase(url);
