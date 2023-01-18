@@ -75,13 +75,6 @@ export const load = (async ({ params, cookies }) => {
 			.create(<RoomsVotersRecord>{ room_id: room.id, voter_id: user.id });
 		voters = [{ id: user.id, voted: false, nickname: user.nickname, vote: undefined }, ...voters];
 	}
-	voters = [
-		{ id: '1', voted: false, nickname: 'Grey Salmon', vote: undefined },
-		{ id: '2', voted: false, nickname: 'Funny Rabbit', vote: undefined },
-		{ id: '3', voted: false, nickname: 'Happy Rainbow', vote: undefined },
-		{ id: '4', voted: false, nickname: 'Smily Dear', vote: undefined },
-		...voters
-	];
 
 	const tasksRecords = await pb
 		.collection(Collections.RoomsTasks)
