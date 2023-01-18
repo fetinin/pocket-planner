@@ -1,0 +1,9 @@
+name = "poket-planner"
+compatibility_date = "2023-01-18"
+main = "./.cloudflare/worker.js"
+
+[site]
+  bucket = "./.cloudflare/public"
+
+[build]
+  command = "npm run build"
