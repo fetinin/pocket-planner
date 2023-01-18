@@ -4,8 +4,8 @@
 	import { pb } from '$lib/store/pb';
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageServerData } from './$types';
-	import { Collections } from '$lib/store/types';
-	import type { RoomsVotersRecord, RoomsVotersResponse, VotersRecord } from '$lib/store/types';
+	import { Collections, type RoomsTasksResponse } from '$lib/store/types';
+	import type { RoomsVotersResponse, RoomsTasksRecord } from '$lib/store/types';
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
 	import Avatar from './Avatar.svelte';
@@ -15,11 +15,15 @@
 	export let myVote = voters.find((v) => v.id == data.user.id)?.vote;
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
 
+	export const numbers = [1, 3, 5, 7, 15, 21, 29];
+
 	let unsubVoters: UnsubscribeFunc;
+	let unsubTasks: UnsubscribeFunc;
+
 	onMount(async () => {
 		unsubVoters = await pb
 			.collection(Collections.RoomsVoters)
-			.subscribe<RoomsVotersRecord>('*', async function ({ action, record }) {
+			.subscribe<RoomsVotersResponse>('*', async function ({ action, record }) {
 				if (record.room_id !== data.room.id) {
 					return;
 				}
@@ -46,9 +50,31 @@
 						console.debug('delete voter', record);
 				}
 			});
-		// todo: add subscription to room tasks
-		// update tasks list
-		// reset myVote after vote is finished
+		unsubTasks = await pb
+			.collection(Collections.RoomsTasks)
+			.subscribe<RoomsTasksResponse>('*', async function ({ action, record }) {
+				if (record.room_id !== data.room.id) {
+					return;
+				}
+				switch (action) {
+					case 'create':
+						data.tasks = [
+							...data.tasks,
+							{ id: record.id, description: record.description, vote: record.vote }
+						];
+						break;
+					case 'update':
+						myVote = undefined;
+						data.tasks = data.tasks.map((r) => {
+							if (r.id == record.id) {
+								return { id: record.id, description: record.description, vote: record.vote };
+							}
+							return r;
+						});
+					case 'delete':
+						data.tasks = data.tasks.filter((r) => r.id == record.id);
+				}
+			});
 	});
 
 	onDestroy(async () => {
@@ -58,10 +84,9 @@
 				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${data.user.id}'`);
 			await pb.collection(Collections.RoomsVoters).delete(currentRoomVoter.id);
 			await unsubVoters();
+			await unsubTasks();
 		}
 	});
-
-	export const numbers = [1, 3, 5, 10, 12];
 </script>
 
 <div class="columns">
@@ -81,7 +106,9 @@
 <div class="columns">
 	<div class="column is-offset-one-quarter is-two-quarter">
 		{#if !currentTask}
-			<h2>Hi {data.user.nickname}! Write your first task to vote for👇</h2>
+			<h2 class="mb-3">
+				Hi {data.user.nickname}! {#if data.user.isRoomAdmin}Write your first task to vote for👇{/if}
+			</h2>
 		{/if}
 		{#if currentTask && !currentTask.vote}
 			<div class="box">
