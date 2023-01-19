@@ -5,7 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageServerData } from './$types';
 	import { Collections, type RoomsTasksResponse } from '$lib/store/types';
-	import type { RoomsVotersResponse, RoomsTasksRecord } from '$lib/store/types';
+	import type { RoomsVotersResponse } from '$lib/store/types';
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
 	import Avatar from './Avatar.svelte';
@@ -71,8 +71,10 @@
 							}
 							return r;
 						});
+						break;
 					case 'delete':
 						data.tasks = data.tasks.filter((r) => r.id == record.id);
+						break;
 				}
 			});
 	});
@@ -95,81 +97,98 @@
 	</div>
 </div>
 
-<div class="columns">
+<div class="columns is-multiline is-centered">
 	{#each voters as v (v.id)}
-		<div class="column">
+		<div class="column is-one-quarter">
 			<Avatar nickname={v.nickname} voted={v.voted} />
 		</div>
 	{/each}
 </div>
 
-<div class="columns">
-	<div class="column is-offset-one-quarter is-two-quarter">
-		{#if !currentTask}
-			<h2 class="mb-3">
-				Hi {data.user.nickname}! {#if data.user.isRoomAdmin}Write your first task to vote for👇{/if}
-			</h2>
-		{/if}
-		{#if currentTask && !currentTask.vote}
-			<div class="box">
-				<p class="has-text-centered mb-2">Voting for👇</p>
-				<p class="has-text-centered">
-					{currentTask.description}
-				</p>
-			</div>
-		{/if}
-
-		<div class="box is-flex is-justify-content-center">
-			<div class="colimns">
-				{#if currentTask && !currentTask?.vote}
-					<div class="column is-full">
-						<form action="?/vote" method="POST" use:enhance>
-							<input type="hidden" name="vote" id="vote" value={myVote} />
-							<!-- todo: center buttons -->
-							<div>
-								{#each numbers as n (n)}
-									<button
-										class="button m-2"
-										class:is-active={myVote === n}
-										on:click={() => (myVote = n)}>{n}</button
-									>
-								{/each}
-							</div>
-						</form>
-					</div>
-				{/if}
-
-				<div class="column is-full is-flex is-justify-content-center">
-					{#if myVote}
-						<p>You voted: {myVote}</p>
-					{/if}
-				</div>
-				{#if data.user.isRoomAdmin}
-					<div class="column is-full is-flex is-justify-content-center">
-						{#if !currentTask || currentTask?.vote}
-							<form action="?/addTask" method="post" use:enhance>
-								<input type="hidden" name="room_id" value={data.room.id} />
-								<!-- // todo: add submit on Cmd+Enter -->
-								<textarea
-									class="textarea"
-									name="content"
-									id="content"
-									placeholder="e.g. Hello world"
-								/>
-								<button class="button">Let's go!</button>
-							</form>
+<!-- is-flex is-justify-content-center -->
+<div class="columns is-centered">
+	<div class="column box is-half p-5">
+		<div class="columns has-text-centered">
+			<div class="column">
+				{#if !currentTask}
+					<p class="m-3">
+						Hi {data.user.nickname}!<br />
+						{#if data.user.isRoomAdmin}Write your first task to vote for👇
 						{:else}
-							<form action="?/endVote" method="post" use:enhance>
-								<input type="hidden" name="room_id" value={data.room.id} />
-								<input type="hidden" name="task_id" value={data.tasks.at(-1)?.id} />
-								<button class="button is-danger">Stop voting</button>
-							</form>
+							⏳ Please wait room admin to start ⏳
 						{/if}
-					</div>
+					</p>
+				{/if}
+				{#if currentTask}
+					{#if !currentTask.vote}
+						<p class="mb-2">Voting for👇</p>
+						<div class="box">
+							<p>{currentTask.description}</p>
+						</div>
+					{:else if !data.user.isRoomAdmin}<p class="mb-2">⏳ Waiting for the next task ⏳</p>
+					{/if}
 				{/if}
 			</div>
 		</div>
 
+		{#if currentTask && !currentTask?.vote}
+			<div class="columns">
+				<div class="colum">
+					<form action="?/vote" method="POST" use:enhance>
+						<input type="hidden" name="vote" id="vote" value={myVote} />
+						<!-- todo: center buttons -->
+						<div>
+							{#each numbers as n (n)}
+								<button
+									class="button m-2"
+									class:is-active={myVote === n}
+									on:click={() => (myVote = n)}>{n}</button
+								>
+							{/each}
+						</div>
+					</form>
+				</div>
+			</div>
+		{/if}
+
+		{#if myVote}
+			<div class="columns">
+				<div class="colum">
+					<p>You voted: {myVote}</p>
+				</div>
+			</div>
+		{/if}
+
+		{#if data.user.isRoomAdmin}
+			<div class="columns">
+				<div class="column">
+					{#if !currentTask || currentTask?.vote}
+						<form action="?/addTask" method="post" use:enhance>
+							<input type="hidden" name="room_id" value={data.room.id} />
+							<!-- // todo: add submit on Cmd+Enter -->
+							<textarea
+								class="textarea"
+								name="content"
+								id="content"
+								placeholder="e.g. Add new shopping cart handler"
+							/>
+							<button class="button mt-3">Let's go!</button>
+						</form>
+					{:else}
+						<form action="?/endVote" method="post" use:enhance>
+							<input type="hidden" name="room_id" value={data.room.id} />
+							<input type="hidden" name="task_id" value={data.tasks.at(-1)?.id} />
+							<button class="button is-danger">Stop voting</button>
+						</form>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
+</div>
+
+<div class="columns is-centered">
+	<div class="column is-half">
 		{#each data.tasks.filter((t) => t.vote).reverse() as task (task.id)}
 			<div class="box">
 				<p>
@@ -179,5 +198,4 @@
 			</div>
 		{/each}
 	</div>
-	<div class="column is-one-quarter" />
 </div>

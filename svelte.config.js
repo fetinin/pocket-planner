@@ -13,7 +13,7 @@ const config = {
 				prependData: '@use "src/variables.scss" as *;'
 			}
 		})
-	],
+],
 
 	kit: {
 		adapter: adapter()

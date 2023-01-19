@@ -40,7 +40,7 @@ export const load = (async ({ params, cookies }) => {
 		var user = await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
 	} catch (err) {
 		console.error('voter not found, invalid user id', err);
-		cookies.delete('userID');
+		cookies.delete('userID', { path: '/' });
 		// todo: Register user instead;
 		throw redirect(303, `/`);
 	}
@@ -111,6 +111,7 @@ export const actions: Actions = {
 			return fail(403);
 		}
 
+		console.log('finding current voter', userID);
 		const currentRoomVoter = await pb
 			.collection(Collections.RoomsVoters)
 			.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);

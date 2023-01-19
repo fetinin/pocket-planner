@@ -18,6 +18,16 @@ import type { Config } from 'unique-names-generator';
 export const actions: Actions = {
 	createNewRoom: async ({ cookies }) => {
 		let userID = cookies.get('userID');
+
+		if (userID) {
+			try {
+				await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
+			} catch (err) {
+				console.error('invalid user id', userID, err);
+				userID = '';
+			}
+		}
+
 		if (!userID) {
 			const user = await pb
 				.collection(Collections.Voters)
