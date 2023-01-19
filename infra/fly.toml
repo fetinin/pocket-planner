@@ -6,11 +6,11 @@ processes = []
 [env]
 
 [build]
-  image = "ghcr.io/muchobien/pocketbase:0.11.2"
+  image = "ghcr.io/muchobien/pocketbase:0.11.3"
 
 [mounts]
-  destination = "/pb/pb_data"
   source = "pb_data"
+  destination = "/pb_data"
 
 [experimental]
   allowed_public_ports = []
