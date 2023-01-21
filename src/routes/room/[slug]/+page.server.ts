@@ -39,7 +39,7 @@ export const load = (async ({ params, cookies }) => {
 	try {
 		var user = await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
 	} catch (err) {
-		console.error('voter not found, invalid user id', err);
+		console.error('voter not found, invalid user id', userID, err);
 		cookies.delete('userID', { path: '/' });
 		// todo: Register user instead;
 		throw redirect(303, `/`);

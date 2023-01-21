@@ -1,6 +1,7 @@
 <script lang="ts">
 	export let nickname: string;
 	export let voted: boolean;
+	export let isYou: boolean;
 </script>
 
 <div class="card">
@@ -15,7 +16,8 @@
 				</figure>
 			</div>
 			<div class="media-content">
-				<p class="title is-5">{nickname}</p>
+				<p class="title is-5 mb-0">{nickname}</p>
+				{#if isYou}<p>(you)</p>{/if}
 			</div>
 		</div>
 		<p class="has-text-centered">

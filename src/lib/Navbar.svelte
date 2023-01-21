@@ -1,56 +1,20 @@
 <nav class="navbar" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="/">
-      <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28" alt="logo">
-    </a>
-
-    <!-- <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a> -->
-  </div>
-
-  <!-- <div id="navbarBasicExample" class="navbar-menu">
-    <div class="navbar-start">
-      <a class="navbar-item" href="/">
-        Home
-      </a> -->
-
-      <!-- <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          More
-        </a>
-
-        <div class="navbar-dropdown">
-          <a class="navbar-item">
-            About
-          </a>
-          <a class="navbar-item">
-            Jobs
-          </a>
-          <a class="navbar-item">
-            Contact
-          </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item">
-            Report an issue
-          </a>
-        </div>
-      </div> -->
-    <!-- </div> -->
-
-    <!-- <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="buttons">
-          <a class="button is-primary">
-            <strong>Sign up</strong>
-          </a>
-          <a class="button is-light">
-            Log in
-          </a>
-        </div>
-      </div>
-    </div> -->
-  <!-- </div> -->
+	<div class="navbar-brand">
+		<a class="navbar-item" href="/">
+			<figure class="image is-64x64 mr-1">
+				<img class="logo" src="/logo.webp" alt="logo" />
+			</figure>
+			<p>Pocket<br />Planner</p>
+		</a>
+	</div>
 </nav>
+
+<style>
+	.logo {
+		border-radius: 15px;
+		max-height: 10rem;
+	}
+	.navbar-item:hover {
+		color: hsl(0deg, 0%, 29%);
+	}
+</style>

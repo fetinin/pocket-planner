@@ -100,7 +100,7 @@
 <div class="columns is-multiline is-centered">
 	{#each voters as v (v.id)}
 		<div class="column is-one-quarter">
-			<Avatar nickname={v.nickname} voted={v.voted} />
+			<Avatar nickname={v.nickname} voted={v.voted} isYou={v.id === data.user.id} />
 		</div>
 	{/each}
 </div>
@@ -112,7 +112,7 @@
 			<div class="column">
 				{#if !currentTask}
 					<p class="m-3">
-						Hi {data.user.nickname}!<br />
+						Hi!<br />
 						{#if data.user.isRoomAdmin}Write your first task to vote for👇
 						{:else}
 							⏳ Please wait room admin to start ⏳
@@ -147,14 +147,6 @@
 							{/each}
 						</div>
 					</form>
-				</div>
-			</div>
-		{/if}
-
-		{#if myVote}
-			<div class="columns">
-				<div class="colum">
-					<p>You voted: {myVote}</p>
 				</div>
 			</div>
 		{/if}

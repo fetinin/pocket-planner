@@ -10,6 +10,7 @@
 					Create a <button class="is-size-6">New room</button>
 				</form>
 				<p>Or join existing</p>
+				<!-- todo: if room not exist, do not redirect and write error in form -->
 				<form action="/room/{roomNumber}">
 					<input type="text" bind:value={roomNumber} />
 					<button disabled={!roomNumber} class="is-size-6">Connect room</button>
