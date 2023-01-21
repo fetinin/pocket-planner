@@ -1,7 +1,8 @@
 import { pb } from '$lib/store/pb';
 import { Collections } from '$lib/store/types';
+import { createNewUser, getUserID, logout } from '$lib/user';
 
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 import type { Actions } from '@sveltejs/kit';
 
@@ -15,7 +16,6 @@ import type {
 	VotersResponse,
 	RoomsTasksResponse
 } from '$lib/store/types';
-
 type Voter = {
 	id: string;
 	nickname: string;
@@ -24,25 +24,17 @@ type Voter = {
 };
 
 export const load = (async ({ params, cookies }) => {
-	if (!params.slug || !isNumber(params.slug)) {
-		throw error(404, {
-			message: 'Not found'
-		});
-	}
-
-	// todo: Register user instead;
-	const userID = cookies.get('userID') || '';
+	let userID = getUserID(cookies);
 	if (!userID) {
-		throw redirect(303, `/`);
+		userID = await createNewUser(cookies);
 	}
 
 	try {
 		var user = await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
 	} catch (err) {
 		console.error('voter not found, invalid user id', userID, err);
-		cookies.delete('userID', { path: '/' });
-		// todo: Register user instead;
-		throw redirect(303, `/`);
+		logout(cookies);
+		throw error(403, 'invalid userID in cookie. Cookie has been deleted, please try again');
 	}
 
 	try {
@@ -111,7 +103,6 @@ export const actions: Actions = {
 			return fail(403);
 		}
 
-		console.log('finding current voter', userID);
 		const currentRoomVoter = await pb
 			.collection(Collections.RoomsVoters)
 			.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
@@ -148,7 +139,7 @@ export const actions: Actions = {
 		return { success: true };
 	},
 
-	endVote: async ({ request, cookies }) => {
+	endVote: async ({ request }) => {
 		const data = await request.formData();
 		const roomID = data.get('room_id');
 		const taskID = data.get('task_id');

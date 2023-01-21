@@ -1,6 +1,6 @@
 import { pb } from '$lib/store/pb';
 import { Collections } from '$lib/store/types';
-import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
+import { createNewUser, getUserID, logout } from '$lib/user';
 
 import { redirect } from '@sveltejs/kit';
 
@@ -13,34 +13,22 @@ import type {
 	RoomsVotersResponse
 } from '$lib/store/types';
 import type { Actions } from './$types';
-import type { Config } from 'unique-names-generator';
 
 export const actions: Actions = {
 	createNewRoom: async ({ cookies }) => {
-		let userID = cookies.get('userID');
+		let userID = getUserID(cookies);
 
 		if (userID) {
 			try {
 				await pb.collection(Collections.Voters).getOne<VotersResponse>(userID);
 			} catch (err) {
-				console.error('invalid user id', userID, err);
+				logout(cookies);
 				userID = '';
 			}
 		}
 
 		if (!userID) {
-			const user = await pb
-				.collection(Collections.Voters)
-				.create<VotersResponse>(<VotersRecord>{ nickname: generateName() });
-			userID = user.id.toString();
-
-			cookies.set('userID', userID, {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: false,
-				maxAge: 60 * 60 * 24 * 30
-			});
+			userID = await createNewUser(cookies);
 		}
 
 		const roomNumber = (Math.random() * 10000).toFixed(0);
@@ -56,13 +44,3 @@ export const actions: Actions = {
 		throw redirect(303, `/room/${roomNumber}`);
 	}
 };
-
-const customConfig: Config = {
-	dictionaries: [adjectives, animals],
-	separator: ' ',
-	length: 2,
-	style: 'capital'
-};
-function generateName(): string {
-	return uniqueNamesGenerator(customConfig);
-}
