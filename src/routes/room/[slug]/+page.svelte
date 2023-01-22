@@ -39,7 +39,7 @@
 						break;
 					case 'update':
 						voters.map((v) => {
-							if (v.id == record.voter_id) {
+							if (v.id === record.voter_id) {
 								v.voted = Boolean(record.vote);
 							}
 						});

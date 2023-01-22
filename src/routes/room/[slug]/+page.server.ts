@@ -98,7 +98,7 @@ function isNumber(val: string): boolean {
 
 export const actions: Actions = {
 	vote: async ({ request, cookies }) => {
-		const userID = cookies.get('userID') || '';
+		const userID = getUserID(cookies);
 		if (!userID) {
 			return fail(403);
 		}
@@ -123,7 +123,7 @@ export const actions: Actions = {
 	},
 
 	addTask: async ({ request, cookies }) => {
-		const userID = cookies.get('userID') || '';
+		const userID = getUserID(cookies);
 		if (!userID) {
 			return fail(403);
 		}
@@ -149,10 +149,14 @@ export const actions: Actions = {
 
 		const votesRecords = await pb
 			.collection(Collections.RoomsVoters)
-			.getFullList<RoomsVotersResponse>(10, { filter: `room_id = '${roomID}'` });
+			.getFullList<RoomsVotersResponse>(20, { filter: `room_id = '${roomID}'` });
+
+		if (!votesRecords.length) {
+			return fail(403, { details: 'No one voted for task yet.' });
+		}
 
 		const votes = votesRecords.map((r) => r.vote).filter(Number) as number[];
-		const avgScore = votes.reduce((p, c) => p + c);
+		const avgScore = votes.reduce((p, c) => p + c) / votes.length;
 
 		await pb.collection(Collections.RoomsTasks).update(taskID.toString(), { vote: avgScore });
 

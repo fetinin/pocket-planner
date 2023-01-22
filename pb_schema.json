@@ -40,7 +40,7 @@
 		"deleteRule": "id = @request.auth.id",
 		"options": {
 			"allowEmailAuth": true,
-			"allowOAuth2Auth": true,
+			"allowOAuth2Auth": false,
 			"allowUsernameAuth": true,
 			"exceptEmailDomains": null,
 			"manageRule": null,

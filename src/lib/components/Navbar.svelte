@@ -12,8 +12,15 @@
 <style>
 	.logo {
 		border-radius: 15px;
-		max-height: 10rem;
+		max-height: 100px;
 	}
+
+	.navbar-item p {
+		line-height: 20px;
+		font-weight: 500;
+		font-size: 1.1rem;
+	}
+
 	.navbar-item:hover {
 		color: hsl(0deg, 0%, 29%);
 	}
