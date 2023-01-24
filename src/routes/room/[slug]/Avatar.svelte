@@ -1,7 +1,8 @@
 <script lang="ts">
 	export let nickname: string;
-	export let voted: boolean;
+	export let vote: number | undefined;
 	export let isYou: boolean;
+	export let showVote: boolean;
 </script>
 
 <div class="card">
@@ -21,7 +22,8 @@
 			</div>
 		</div>
 		<p class="has-text-centered">
-			{#if voted}✅{:else}❌{/if}
+			{#if vote}✅{:else}❌{/if}
+			{#if vote && showVote}{vote}{/if}
 		</p>
 	</div>
 </div>

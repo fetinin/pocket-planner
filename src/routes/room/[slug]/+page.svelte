@@ -38,11 +38,14 @@
 						console.debug('add voter', record);
 						break;
 					case 'update':
+						console.log('voters before', voters);
 						voters.map((v) => {
 							if (v.id === record.voter_id) {
 								v.voted = Boolean(record.vote);
+								v.vote = record.vote;
 							}
 						});
+						console.log('voters after', voters);
 						voters = voters;
 						break;
 					case 'delete':
@@ -100,7 +103,12 @@
 <div class="columns is-multiline is-centered">
 	{#each voters as v (v.id)}
 		<div class="column is-one-quarter">
-			<Avatar nickname={v.nickname} voted={v.voted} isYou={v.id === data.user.id} />
+			<Avatar
+				nickname={v.nickname}
+				isYou={v.id === data.user.id}
+				vote={v.vote}
+				showVote={Boolean(currentTask?.vote)}
+			/>
 		</div>
 	{/each}
 </div>

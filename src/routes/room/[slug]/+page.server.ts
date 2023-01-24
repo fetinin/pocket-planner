@@ -92,10 +92,6 @@ export const load = (async ({ params, cookies }) => {
 	};
 }) satisfies PageServerLoad;
 
-function isNumber(val: string): boolean {
-	return /^-?\d+$/.test(val);
-}
-
 export const actions: Actions = {
 	vote: async ({ request, cookies }) => {
 		const userID = getUserID(cookies);
@@ -103,9 +99,14 @@ export const actions: Actions = {
 			return fail(403);
 		}
 
-		const currentRoomVoter = await pb
-			.collection(Collections.RoomsVoters)
-			.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
+		try {
+			var currentRoomVoter = await pb
+				.collection(Collections.RoomsVoters)
+				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
+		} catch (err) {
+			console.error('Room voter not found', userID);
+			return fail(403);
+		}
 
 		const data = await request.formData();
 		const voteValue = data.get('vote');
@@ -136,6 +137,13 @@ export const actions: Actions = {
 			.collection(Collections.RoomsTasks)
 			.create<RoomsTasksResponse>(<RoomsTasksRecord>{ description: description, room_id: roomID });
 
+		const votesRecords = await pb
+			.collection(Collections.RoomsVoters)
+			.getFullList<RoomsVotersResponse>(20, { filter: `room_id = '${roomID}'` });
+
+		votesRecords.forEach(async (r) => {
+			await pb.collection(Collections.RoomsVoters).update(r.id, { vote: null });
+		});
 		return { success: true };
 	},
 
@@ -151,7 +159,7 @@ export const actions: Actions = {
 			.collection(Collections.RoomsVoters)
 			.getFullList<RoomsVotersResponse>(20, { filter: `room_id = '${roomID}'` });
 
-		if (!votesRecords.length) {
+		if (!votesRecords.filter((r) => Boolean(r.vote)).length) {
 			return fail(403, { details: 'No one voted for task yet.' });
 		}
 
@@ -160,9 +168,6 @@ export const actions: Actions = {
 
 		await pb.collection(Collections.RoomsTasks).update(taskID.toString(), { vote: avgScore });
 
-		votesRecords.forEach(async (r) => {
-			await pb.collection(Collections.RoomsVoters).update(r.id, { vote: null });
-		});
 		return { success: true };
 	}
 };
