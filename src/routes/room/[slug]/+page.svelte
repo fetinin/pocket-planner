@@ -151,11 +151,10 @@
 
 		{#if currentTask && !currentTask?.vote}
 			<div class="columns">
-				<div class="colum">
+				<div class="column">
 					<form action="?/vote" method="POST" use:enhance>
 						<input type="hidden" name="vote" id="vote" value={myVote} />
-						<!-- todo: center buttons -->
-						<div>
+						<div class="is-flex is-justify-content-center">
 							{#each numbers as n (n)}
 								<button
 									class="button m-2"
@@ -187,10 +186,13 @@
 							<button class="button mt-3">Let's go!</button>
 						</form>
 					{:else}
-						<form action="?/endVote" method="post" use:enhance>
+						<form action="?/endVote" method="post" use:enhance class="has-text-centered">
 							<input type="hidden" name="room_id" value={data.room.id} />
 							<input type="hidden" name="task_id" value={data.tasks.at(-1)?.id} />
 							<button class="button is-danger">Stop voting</button>
+							{#if form?.endVote?.error}
+								<p class="has-text-danger">{form.endVote.error}</p>
+							{/if}
 						</form>
 					{/if}
 				</div>
