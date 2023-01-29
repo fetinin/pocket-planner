@@ -20,6 +20,15 @@
 	let unsubVoters: UnsubscribeFunc;
 	let unsubTasks: UnsubscribeFunc;
 
+	function submitOnAltEnter(e: KeyboardEvent) {
+		const altKeyPressed = e.altKey || e.metaKey;
+		if (!altKeyPressed || e.key !== 'Enter') {
+			return;
+		}
+
+		(e.target as HTMLFormElement).form.submit();
+	}
+
 	onMount(async () => {
 		unsubVoters = await pb
 			.collection(Collections.RoomsVoters)
@@ -163,9 +172,8 @@
 			<div class="columns">
 				<div class="column">
 					{#if !currentTask || currentTask?.vote}
-						<form action="?/addTask" method="post" use:enhance>
+						<form action="?/addTask" method="post" use:enhance on:keypress={submitOnAltEnter}>
 							<input type="hidden" name="room_id" value={data.room.id} />
-							<!-- // todo: add submit on Cmd+Enter -->
 							<textarea
 								class="textarea"
 								name="content"
