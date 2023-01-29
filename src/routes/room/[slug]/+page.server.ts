@@ -96,7 +96,7 @@ export const actions: Actions = {
 	vote: async ({ request, cookies }) => {
 		const userID = getUserID(cookies);
 		if (!userID) {
-			return fail(403);
+			throw error(403);
 		}
 
 		try {
@@ -105,13 +105,13 @@ export const actions: Actions = {
 				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
 		} catch (err) {
 			console.error('Room voter not found', userID);
-			return fail(403);
+			throw error(403);
 		}
 
 		const data = await request.formData();
 		const voteValue = data.get('vote');
 		if (!voteValue) {
-			return fail(400, { vote: 'missing vote' });
+			return fail(400, { vote: { error: 'missing vote' } });
 		}
 
 		await pb.collection(Collections.RoomsVoters).update<RoomsVotersResponse>(currentRoomVoter.id, <
@@ -126,12 +126,16 @@ export const actions: Actions = {
 	addTask: async ({ request, cookies }) => {
 		const userID = getUserID(cookies);
 		if (!userID) {
-			return fail(403);
+			throw error(403);
 		}
 
 		const data = await request.formData();
 		const description = data.get('content');
 		const roomID = data.get('room_id');
+
+		if (!description) {
+			return fail(400, { addTask: { error: { description: 'Description is required' } } });
+		}
 
 		await pb
 			.collection(Collections.RoomsTasks)
@@ -152,7 +156,7 @@ export const actions: Actions = {
 		const roomID = data.get('room_id');
 		const taskID = data.get('task_id');
 		if (!taskID || !roomID) {
-			return fail(400, { error: 'room_id or task_id is missing' });
+			throw error(400, 'room_id or task_id is missing');
 		}
 
 		const votesRecords = await pb
@@ -160,7 +164,7 @@ export const actions: Actions = {
 			.getFullList<RoomsVotersResponse>(20, { filter: `room_id = '${roomID}'` });
 
 		if (!votesRecords.filter((r) => Boolean(r.vote)).length) {
-			return fail(403, { details: 'No one voted for task yet.' });
+			return fail(403, { endVote: { error: 'No one voted for the task yet.' } });
 		}
 
 		const votes = votesRecords.map((r) => r.vote).filter(Number) as number[];

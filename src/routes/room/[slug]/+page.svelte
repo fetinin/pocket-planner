@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { pb } from '$lib/store/pb';
 	import { onDestroy, onMount } from 'svelte';
-	import type { PageServerData } from './$types';
+	import type { ActionData, PageServerData } from './$types';
 	import { Collections, type RoomsTasksResponse } from '$lib/store/types';
 	import type { RoomsVotersResponse } from '$lib/store/types';
 	import type { UnsubscribeFunc } from 'pocketbase';
@@ -14,6 +14,8 @@
 	export let voters = data.voters;
 	export let myVote = voters.find((v) => v.id == data.user.id)?.vote;
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
+
+	export let form: ActionData;
 
 	export const numbers = [1, 3, 5, 7, 15, 21, 29];
 
@@ -122,7 +124,6 @@
 	{/each}
 </div>
 
-<!-- is-flex is-justify-content-center -->
 <div class="columns is-centered">
 	<div class="column box is-half p-5">
 		<div class="columns has-text-centered">
@@ -180,6 +181,9 @@
 								id="content"
 								placeholder="e.g. Add new shopping cart handler"
 							/>
+							{#if form?.addTask?.error?.description}<p class="has-text-danger">
+									Enter task description
+								</p>{/if}
 							<button class="button mt-3">Let's go!</button>
 						</form>
 					{:else}
