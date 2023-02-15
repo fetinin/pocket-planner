@@ -19,7 +19,7 @@ export async function createNewUser(cookies: Cookies): Promise<string> {
 		httpOnly: true,
 		sameSite: 'strict',
 		secure: false,
-		maxAge: 60 * 60 * 24 * 30
+		maxAge: 60 * 60 * 24 * 30 * 12
 	});
 
 	return userID;

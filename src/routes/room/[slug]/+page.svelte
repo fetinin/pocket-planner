@@ -17,7 +17,7 @@
 
 	export let form: ActionData;
 
-	export const numbers = [1, 3, 5, 7, 15, 21, 29];
+	export const numbers = [1, 2, 3, 4, 6, 8, 12, 16, 20, 24, 32, 40, 100500];
 
 	let unsubVoters: UnsubscribeFunc;
 	let unsubTasks: UnsubscribeFunc;
@@ -125,7 +125,7 @@
 </div>
 
 <div class="columns is-centered">
-	<div class="column box is-half p-5">
+	<div class="column box is-three-quarters is-full-mobile p-5">
 		<div class="columns has-text-centered">
 			<div class="column">
 				{#if !currentTask}
@@ -153,8 +153,9 @@
 			<div class="columns">
 				<div class="column">
 					<form action="?/vote" method="POST" use:enhance>
+						<input type="hidden" name="roomID" id="roomID" value={data.room.id} />
 						<input type="hidden" name="vote" id="vote" value={myVote} />
-						<div class="is-flex is-justify-content-center">
+						<div class="has-text-centered">
 							{#each numbers as n (n)}
 								<button
 									class="button m-2"

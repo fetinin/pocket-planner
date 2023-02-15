@@ -7,7 +7,6 @@ import { redirect } from '@sveltejs/kit';
 import type {
 	RoomsRecord,
 	RoomsResponse,
-	VotersRecord,
 	VotersResponse,
 	RoomsVotersRecord,
 	RoomsVotersResponse
@@ -41,6 +40,6 @@ export const actions: Actions = {
 			voter_id: userID
 		});
 
-		throw redirect(303, `/room/${roomNumber}`);
+		throw redirect(302, `/room/${roomNumber}`);
 	}
 };

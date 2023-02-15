@@ -99,19 +99,24 @@ export const actions: Actions = {
 			throw error(403);
 		}
 
-		try {
-			var currentRoomVoter = await pb
-				.collection(Collections.RoomsVoters)
-				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}'`);
-		} catch (err) {
-			console.error('Room voter not found', userID);
-			throw error(403);
-		}
-
 		const data = await request.formData();
 		const voteValue = data.get('vote');
 		if (!voteValue) {
 			return fail(400, { vote: { error: 'missing vote' } });
+		}
+
+		const roomID = data.get('roomID');
+		if (!roomID) {
+			return fail(400, { vote: { error: 'missing roomID' } });
+		}
+
+		try {
+			var currentRoomVoter = await pb
+				.collection(Collections.RoomsVoters)
+				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}' && room_id = '${roomID}'`);
+		} catch (err) {
+			console.error('Room voter not found', userID);
+			throw error(403);
 		}
 
 		await pb.collection(Collections.RoomsVoters).update<RoomsVotersResponse>(currentRoomVoter.id, <
