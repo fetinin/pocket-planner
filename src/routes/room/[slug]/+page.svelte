@@ -9,6 +9,7 @@
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
 	import Avatar from './Avatar.svelte';
+	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
@@ -34,61 +35,21 @@
 	onMount(async () => {
 		unsubVoters = await pb
 			.collection(Collections.RoomsVoters)
-			.subscribe<RoomsVotersResponse>('*', async function ({ action, record }) {
+			.subscribe<RoomsVotersResponse>('*', async ({ action, record }) => {
 				if (record.room_id !== data.room.id) {
 					return;
 				}
-
-				switch (action) {
-					case 'create':
-						const voter = await pb.collection(Collections.Voters).getOne(record.voter_id);
-						voters = [
-							{ id: record.voter_id, voted: false, nickname: voter.nickname, vote: record.vote },
-							...voters
-						];
-						console.debug('add voter', record);
-						break;
-					case 'update':
-						console.log('voters before', voters);
-						voters.map((v) => {
-							if (v.id === record.voter_id) {
-								v.voted = Boolean(record.vote);
-								v.vote = record.vote;
-							}
-						});
-						console.log('voters after', voters);
-						voters = voters;
-						break;
-					case 'delete':
-						voters = voters.filter((v) => v.id !== record.voter_id);
-						console.debug('delete voter', record);
-				}
+				voters = await handleVotersUpdate(voters, action, record);
 			});
 		unsubTasks = await pb
 			.collection(Collections.RoomsTasks)
-			.subscribe<RoomsTasksResponse>('*', async function ({ action, record }) {
+			.subscribe<RoomsTasksResponse>('*', async ({ action, record }) => {
 				if (record.room_id !== data.room.id) {
 					return;
 				}
-				switch (action) {
-					case 'create':
-						data.tasks = [
-							...data.tasks,
-							{ id: record.id, description: record.description, vote: record.vote }
-						];
-						break;
-					case 'update':
-						myVote = undefined;
-						data.tasks = data.tasks.map((r) => {
-							if (r.id == record.id) {
-								return { id: record.id, description: record.description, vote: record.vote };
-							}
-							return r;
-						});
-						break;
-					case 'delete':
-						data.tasks = data.tasks.filter((r) => r.id == record.id);
-						break;
+				data.tasks = handleTasksUpdate(data.tasks, action, record);
+				if (action === 'create') {
+					myVote = undefined;
 				}
 			});
 	});
@@ -153,7 +114,7 @@
 			<div class="columns">
 				<div class="column">
 					<form action="?/vote" method="POST" use:enhance>
-						<input type="hidden" name="roomID" id="roomID" value={data.room.id} />
+						<input type="hidden" name="room_id" id="room_id" value={data.room.id} />
 						<input type="hidden" name="vote" id="vote" value={myVote} />
 						<div class="has-text-centered">
 							{#each numbers as n (n)}

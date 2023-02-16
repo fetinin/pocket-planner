@@ -16,11 +16,16 @@ import type {
 	VotersResponse,
 	RoomsTasksResponse
 } from '$lib/store/types';
-type Voter = {
+export type Voter = {
 	id: string;
 	nickname: string;
 	vote: number | undefined;
 	voted: boolean;
+};
+export type Task = {
+	id: string;
+	description: string;
+	vote?: number;
 };
 
 export const load = (async ({ params, cookies }) => {
@@ -70,9 +75,9 @@ export const load = (async ({ params, cookies }) => {
 
 	const tasksRecords = await pb
 		.collection(Collections.RoomsTasks)
-		.getFullList<RoomsTasksResponse>(50, { filter: `room_id='${room.id}'` });
+		.getFullList<RoomsTasksResponse>(50, { filter: `room_id='${room.id}'`, order: 'created' });
 
-	const tasks = tasksRecords.map((r) => {
+	const tasks: Task[] = tasksRecords.map((r) => {
 		return { id: r.id, description: r.description, vote: r.vote };
 	});
 
@@ -105,9 +110,9 @@ export const actions: Actions = {
 			return fail(400, { vote: { error: 'missing vote' } });
 		}
 
-		const roomID = data.get('roomID');
+		const roomID = data.get('room_id');
 		if (!roomID) {
-			return fail(400, { vote: { error: 'missing roomID' } });
+			return fail(400, { vote: { error: 'missing room_id' } });
 		}
 
 		try {
@@ -139,7 +144,10 @@ export const actions: Actions = {
 		const roomID = data.get('room_id');
 
 		if (!description) {
-			return fail(400, { addTask: { error: { description: 'Description is required' } } });
+			return fail(400, { addTask: { error: { description: 'content is required' } } });
+		}
+		if (!roomID) {
+			return fail(400, { addTask: { error: { description: 'room_id is required' } } });
 		}
 
 		await pb
