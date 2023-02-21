@@ -40,6 +40,6 @@ export const actions: Actions = {
 			voter_id: userID
 		});
 
-		throw redirect(302, `/room/${roomNumber}`);
+		throw redirect(303, `/room/${roomNumber}`);
 	}
 };
