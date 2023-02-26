@@ -63,9 +63,10 @@
 				"required": true,
 				"unique": false,
 				"options": {
-					"maxSelect": 1,
 					"collectionId": "r25pd3ot3lf87e3",
-					"cascadeDelete": true
+					"cascadeDelete": true,
+					"maxSelect": 1,
+					"displayFields": null
 				}
 			},
 			{
@@ -128,9 +129,10 @@
 				"required": true,
 				"unique": false,
 				"options": {
-					"maxSelect": 1,
 					"collectionId": "91bwt8zjwnoi4lp",
-					"cascadeDelete": false
+					"cascadeDelete": false,
+					"maxSelect": 1,
+					"displayFields": null
 				}
 			}
 		],
@@ -182,9 +184,10 @@
 				"required": true,
 				"unique": false,
 				"options": {
-					"maxSelect": 1,
 					"collectionId": "r25pd3ot3lf87e3",
-					"cascadeDelete": false
+					"cascadeDelete": false,
+					"maxSelect": 1,
+					"displayFields": null
 				}
 			},
 			{
@@ -195,9 +198,10 @@
 				"required": true,
 				"unique": false,
 				"options": {
-					"maxSelect": 1,
 					"collectionId": "91bwt8zjwnoi4lp",
-					"cascadeDelete": true
+					"cascadeDelete": true,
+					"maxSelect": 1,
+					"displayFields": null
 				}
 			},
 			{
@@ -210,6 +214,18 @@
 				"options": {
 					"min": 0,
 					"max": null
+				}
+			},
+			{
+				"id": "ajilz25k",
+				"name": "role",
+				"type": "select",
+				"system": false,
+				"required": false,
+				"unique": false,
+				"options": {
+					"maxSelect": 1,
+					"values": ["dev", "qa", "observer"]
 				}
 			}
 		],
