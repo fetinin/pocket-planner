@@ -1,5 +1,5 @@
 import { pb } from '$lib/store/pb';
-import { Collections } from '$lib/store/types';
+import { Collections, RoomsVotersRoleOptions } from '$lib/store/types';
 import { createNewUser, getUserID, logout } from '$lib/user';
 
 import { error, fail } from '@sveltejs/kit';
@@ -19,8 +19,9 @@ import type {
 export type Voter = {
 	id: string;
 	nickname: string;
-	vote: number | undefined;
+	vote?: number;
 	voted: boolean;
+	role?: RoomsVotersRoleOptions;
 };
 export type Task = {
 	id: string;
@@ -61,7 +62,8 @@ export const load = (async ({ params, cookies }) => {
 			id: r.voter_id,
 			voted: Boolean(r.vote),
 			nickname: (r.expand as { voter_id: VotersRecord }).voter_id.nickname,
-			vote: r.vote
+			vote: r.vote,
+			role: r.role
 		};
 	});
 
@@ -124,9 +126,7 @@ export const actions: Actions = {
 			throw error(403);
 		}
 
-		await pb.collection(Collections.RoomsVoters).update<RoomsVotersResponse>(currentRoomVoter.id, <
-			RoomsVotersRecord
-		>{
+		await pb.collection(Collections.RoomsVoters).update(currentRoomVoter.id, <RoomsVotersRecord>{
 			vote: parseInt(voteValue.toString())
 		});
 
@@ -184,6 +184,40 @@ export const actions: Actions = {
 		const avgScore = votes.reduce((p, c) => p + c) / votes.length;
 
 		await pb.collection(Collections.RoomsTasks).update(taskID.toString(), { vote: avgScore });
+
+		return { success: true };
+	},
+
+	setRole: async ({ request, cookies }) => {
+		const userID = getUserID(cookies);
+		if (!userID) {
+			throw error(403);
+		}
+
+		const data = await request.formData();
+
+		const role = data.get('role');
+		if (!role) {
+			throw error(400, 'role is missing');
+		}
+
+		const roomID = data.get('room_id');
+		if (!roomID) {
+			throw error(400, 'room_id is missing');
+		}
+
+		try {
+			var roomVoter = await pb
+				.collection(Collections.RoomsVoters)
+				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${userID}' && room_id = '${roomID}'`);
+		} catch (err) {
+			console.error('Room voter not found', userID);
+			throw error(403);
+		}
+
+		await pb
+			.collection(Collections.RoomsVoters)
+			.update<RoomsVotersRecord>(roomVoter.id, { role: role });
 
 		return { success: true };
 	}

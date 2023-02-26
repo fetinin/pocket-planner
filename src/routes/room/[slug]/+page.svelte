@@ -4,7 +4,7 @@
 	import { pb } from '$lib/store/pb';
 	import { onDestroy, onMount } from 'svelte';
 	import type { ActionData, PageServerData } from './$types';
-	import { Collections, type RoomsTasksResponse } from '$lib/store/types';
+	import { Collections, type RoomsTasksResponse, RoomsVotersRoleOptions } from '$lib/store/types';
 	import type { RoomsVotersResponse } from '$lib/store/types';
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
@@ -19,6 +19,27 @@
 	export let form: ActionData;
 
 	export const numbers = [1, 2, 3, 4, 6, 8, 12, 16, 20, 24, 32, 40, 100500];
+
+	export const roles: RoomsVotersRoleOptions[] = [
+		RoomsVotersRoleOptions.dev,
+		RoomsVotersRoleOptions.qa,
+		RoomsVotersRoleOptions.observer
+	];
+	export let myRole = voters.find((v) => v.id == data.user.id)?.role;
+	export let showRoleSelect = !myRole;
+
+	function roleAsText(role?: string): string {
+		switch (role) {
+			case 'dev':
+				return 'Dev 💻';
+			case 'qa':
+				return 'QA 🦊';
+			case 'observer':
+				return 'Observer 🕶️';
+			default:
+				return '?!';
+		}
+	}
 
 	let unsubVoters: UnsubscribeFunc;
 	let unsubTasks: UnsubscribeFunc;
@@ -80,10 +101,44 @@
 				isYou={v.id === data.user.id}
 				vote={v.vote}
 				showVote={Boolean(currentTask?.vote)}
+				role={v.role}
+				on:roleClicked={() => (showRoleSelect = true)}
 			/>
 		</div>
 	{/each}
 </div>
+
+{#if showRoleSelect}
+	<div class="columns is-centered mb-5">
+		<div class="column box is-three-quarters is-full-mobile p-5">
+			<div class="columns">
+				<div class="column">
+					<p class="has-text-centered">Choose your role 🥸</p>
+					<form
+						action="?/setRole"
+						method="POST"
+						use:enhance
+						on:submit={(e) => {
+							showRoleSelect = false;
+						}}
+					>
+						<input type="hidden" name="room_id" id="room_id" value={data.room.id} />
+						<input type="hidden" name="role" id="role" value={myRole} />
+						<div class="has-text-centered">
+							{#each roles as role (role)}
+								<button
+									class="button m-2"
+									class:is-active={myRole === role}
+									on:click={() => (myRole = role)}>{roleAsText(role)}</button
+								>
+							{/each}
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <div class="columns is-centered">
 	<div class="column box is-three-quarters is-full-mobile p-5">
@@ -92,7 +147,8 @@
 				{#if !currentTask}
 					<p class="m-3">
 						Hi!<br />
-						{#if data.user.isRoomAdmin}Write your first task to vote for👇
+						{#if data.user.isRoomAdmin}
+							Write your first task to vote for👇
 						{:else}
 							⏳ Please wait room admin to start ⏳
 						{/if}

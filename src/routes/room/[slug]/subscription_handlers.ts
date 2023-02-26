@@ -15,7 +15,13 @@ export async function handleVotersUpdate(
 		case 'create':
 			const voter = await pb.collection(Collections.Voters).getOne(record.voter_id);
 			voters = [
-				{ id: record.voter_id, voted: false, nickname: voter.nickname, vote: record.vote },
+				{
+					id: record.voter_id,
+					voted: false,
+					nickname: voter.nickname,
+					vote: record.vote,
+					role: record.role
+				},
 				...voters
 			];
 			console.debug('add voter', record);
@@ -26,6 +32,7 @@ export async function handleVotersUpdate(
 				if (v.id === record.voter_id) {
 					v.voted = Boolean(record.vote);
 					v.vote = record.vote;
+					v.role = record.role;
 				}
 			});
 			console.log('voters after', voters);
