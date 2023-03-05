@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	let roomNumber: String;
+	let roomNumber: string = '';
 </script>
 
 <div class="columns">
@@ -11,7 +11,7 @@
 				<!-- todo: if room not exist, do not redirect and write error in form -->
 				<div class="columns mb-0" style="height: auto;">
 					<div class="column">
-						<form action="/room/{roomNumber}" use:enhance>
+						<form action="/room/{roomNumber}">
 							<div class="columns">
 								<div class="column is-two-third pr-0">
 									<input

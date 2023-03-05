@@ -27,7 +27,9 @@ export type Task = {
 	id: string;
 	description: string;
 	vote?: number;
+	voteByRole?: VoteByRole;
 };
+export type VoteByRole = { [key in keyof typeof RoomsVotersRoleOptions]: number };
 
 export const load = (async ({ params, cookies }) => {
 	let userID = getUserID(cookies);
@@ -69,9 +71,10 @@ export const load = (async ({ params, cookies }) => {
 
 	const roomHasCurrentUser = roomsVotersRecords.some((r) => r.voter_id === user.id);
 	if (!roomHasCurrentUser) {
-		await pb
-			.collection(Collections.RoomsVoters)
-			.create(<RoomsVotersRecord>{ room_id: room.id, voter_id: user.id });
+		await pb.collection(Collections.RoomsVoters).create(<RoomsVotersRecord>{
+			room_id: room.id,
+			voter_id: user.id
+		});
 		voters = [{ id: user.id, voted: false, nickname: user.nickname, vote: undefined }, ...voters];
 	}
 
@@ -80,7 +83,12 @@ export const load = (async ({ params, cookies }) => {
 		.getFullList<RoomsTasksResponse>(50, { filter: `room_id='${room.id}'`, order: 'created' });
 
 	const tasks: Task[] = tasksRecords.map((r) => {
-		return { id: r.id, description: r.description, vote: r.vote };
+		return {
+			id: r.id,
+			description: r.description,
+			vote: r.vote,
+			voteByRole: r.vote_by_role as VoteByRole
+		};
 	});
 
 	return {
@@ -126,6 +134,11 @@ export const actions: Actions = {
 			throw error(403);
 		}
 
+		const role = currentRoomVoter.role;
+		if (!role || role === RoomsVotersRoleOptions.observer) {
+			throw error(403, 'Voting without role or as observer is not allowed');
+		}
+
 		await pb.collection(Collections.RoomsVoters).update(currentRoomVoter.id, <RoomsVotersRecord>{
 			vote: parseInt(voteValue.toString())
 		});
@@ -152,7 +165,7 @@ export const actions: Actions = {
 
 		await pb
 			.collection(Collections.RoomsTasks)
-			.create<RoomsTasksResponse>(<RoomsTasksRecord>{ description: description, room_id: roomID });
+			.create<RoomsTasksRecord>({ description: description, room_id: roomID });
 
 		const votesRecords = await pb
 			.collection(Collections.RoomsVoters)
@@ -180,10 +193,28 @@ export const actions: Actions = {
 			return fail(403, { endVote: { error: 'No one voted for the task yet.' } });
 		}
 
-		const votes = votesRecords.map((r) => r.vote).filter(Number) as number[];
+		let votesByRole = new Map<string, number[]>();
+		votesRecords.forEach((vote) => {
+			if (!vote.role || !vote.vote) return;
+
+			let roleVotes = votesByRole.get(vote.role) || [];
+			roleVotes.push(vote.vote);
+			votesByRole.set(vote.role, roleVotes);
+		});
+
+		let avgVotesByRole = new Map<string, number>();
+		votesByRole.forEach((votes, role, _) => {
+			const avgScore = votes.reduce((p, c) => p + c) / votes.length;
+			avgVotesByRole.set(role, avgScore);
+		});
+
+		const votes = votesRecords.map((r) => r.vote).filter(notUndefined);
 		const avgScore = votes.reduce((p, c) => p + c) / votes.length;
 
-		await pb.collection(Collections.RoomsTasks).update(taskID.toString(), { vote: avgScore });
+		await pb.collection(Collections.RoomsTasks).update<RoomsTasksRecord>(taskID.toString(), {
+			vote: avgScore,
+			vote_by_role: JSON.stringify(Object.fromEntries(avgVotesByRole))
+		});
 
 		return { success: true };
 	},
@@ -222,3 +253,7 @@ export const actions: Actions = {
 		return { success: true };
 	}
 };
+
+function notUndefined<T>(x: T | undefined): x is T {
+	return x !== undefined;
+}

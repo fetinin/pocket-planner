@@ -3,7 +3,7 @@ import { pb } from '$lib/store/pb';
 import { Collections } from '../../../lib/store/types';
 
 import type { RoomsVotersResponse, RoomsTasksResponse } from '$lib/store/types';
-import type { Task, Voter } from './+page.server';
+import type { Task, VoteByRole, Voter } from './+page.server';
 
 export async function handleVotersUpdate(
 	voters: Voter[],
@@ -27,15 +27,18 @@ export async function handleVotersUpdate(
 			console.debug('add voter', record);
 			break;
 		case 'update':
-			console.log('voters before', voters);
-			voters.map((v) => {
+			voters = voters.map((v) => {
 				if (v.id === record.voter_id) {
-					v.voted = Boolean(record.vote);
-					v.vote = record.vote;
-					v.role = record.role;
+					console.debug('update voter', v);
+					v = {
+						...v,
+						voted: Boolean(record.vote),
+						vote: record.vote,
+						role: record.role
+					};
 				}
+				return v;
 			});
-			console.log('voters after', voters);
 			break;
 		case 'delete':
 			voters = voters.filter((v) => v.id !== record.voter_id);
@@ -52,12 +55,25 @@ export function handleTasksUpdate(
 ): Task[] {
 	switch (action) {
 		case 'create':
-			tasks = [...tasks, { id: record.id, description: record.description, vote: record.vote }];
+			tasks = [
+				...tasks,
+				{
+					id: record.id,
+					description: record.description,
+					vote: record.vote,
+					voteByRole: record.vote_by_role as VoteByRole
+				}
+			];
 			break;
 		case 'update':
 			tasks = tasks.map((r) => {
 				if (r.id == record.id) {
-					return { id: record.id, description: record.description, vote: record.vote };
+					return {
+						id: record.id,
+						description: record.description,
+						vote: record.vote,
+						voteByRole: record.vote_by_role as VoteByRole
+					};
 				}
 				return r;
 			});

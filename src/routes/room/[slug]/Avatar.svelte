@@ -1,24 +1,30 @@
 <script lang="ts">
+	import { RoomsVotersRoleOptions } from '$lib/store/types';
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 	export let nickname: string;
 	export let vote: number | undefined;
 	export let isYou: boolean;
-	export let showVote: boolean;
-	export let role: string | undefined;
+	export let isVotingPhase: boolean;
+	export let role: RoomsVotersRoleOptions | undefined;
+	console.log('voter', nickname, vote);
 
 	function roleAsIcon(role?: string): string {
 		switch (role) {
-			case 'dev':
+			case RoomsVotersRoleOptions.dev:
 				return '💻';
-			case 'qa':
+			case RoomsVotersRoleOptions.qa:
 				return '🦊';
-			case 'observer':
+			case RoomsVotersRoleOptions.observer:
 				return '🕶️';
 			default:
-				return '🤔';
+				return '🥸';
 		}
+	}
+
+	function isObserver(role?: RoomsVotersRoleOptions): boolean {
+		return !role || role === RoomsVotersRoleOptions.observer;
 	}
 </script>
 
@@ -46,10 +52,13 @@
 				{#if isYou}<p>(you)</p>{/if}
 			</div>
 		</div>
-		{#if role !== 'observer'}
+
+		{#if !isObserver(role)}
 			<p class="has-text-centered">
-				{#if vote}✅{:else}❌{/if}
-				{#if vote && showVote}{vote}{/if}
+				{#if isVotingPhase}
+					{#if vote}✅{:else}🤔{/if}
+				{:else if vote}{vote}
+				{/if}
 			</p>
 		{/if}
 	</div>

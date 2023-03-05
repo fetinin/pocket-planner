@@ -18,7 +18,7 @@
 
 	export let form: ActionData;
 
-	export const numbers = [1, 2, 3, 4, 6, 8, 12, 16, 20, 24, 32, 40, 100500];
+	export const voteOptions = [1, 2, 3, 4, 6, 8, 12, 16, 20, 24, 32, 40, 100500];
 
 	export const roles: RoomsVotersRoleOptions[] = [
 		RoomsVotersRoleOptions.dev,
@@ -40,6 +40,9 @@
 				return '?!';
 		}
 	}
+	function isObserver(role?: RoomsVotersRoleOptions): boolean {
+		return !role || role === RoomsVotersRoleOptions.observer;
+	}
 
 	let unsubVoters: UnsubscribeFunc;
 	let unsubTasks: UnsubscribeFunc;
@@ -57,17 +60,15 @@
 		unsubVoters = await pb
 			.collection(Collections.RoomsVoters)
 			.subscribe<RoomsVotersResponse>('*', async ({ action, record }) => {
-				if (record.room_id !== data.room.id) {
-					return;
-				}
+				if (record.room_id !== data.room.id) return;
+
 				voters = await handleVotersUpdate(voters, action, record);
 			});
 		unsubTasks = await pb
 			.collection(Collections.RoomsTasks)
 			.subscribe<RoomsTasksResponse>('*', async ({ action, record }) => {
-				if (record.room_id !== data.room.id) {
-					return;
-				}
+				if (record.room_id !== data.room.id) return;
+
 				data.tasks = handleTasksUpdate(data.tasks, action, record);
 				if (action === 'create') {
 					myVote = undefined;
@@ -76,14 +77,14 @@
 	});
 
 	onDestroy(async () => {
-		if (browser) {
-			let currentRoomVoter = await pb
-				.collection(Collections.RoomsVoters)
-				.getFirstListItem<RoomsVotersResponse>(`voter_id = '${data.user.id}'`);
-			await pb.collection(Collections.RoomsVoters).delete(currentRoomVoter.id);
-			await unsubVoters();
-			await unsubTasks();
-		}
+		if (!browser) return;
+
+		let currentRoomVoter = await pb
+			.collection(Collections.RoomsVoters)
+			.getFirstListItem<RoomsVotersResponse>(`voter_id = '${data.user.id}'`);
+		await pb.collection(Collections.RoomsVoters).delete(currentRoomVoter.id);
+		await unsubVoters();
+		await unsubTasks();
 	});
 </script>
 
@@ -100,7 +101,7 @@
 				nickname={v.nickname}
 				isYou={v.id === data.user.id}
 				vote={v.vote}
-				showVote={Boolean(currentTask?.vote)}
+				isVotingPhase={Boolean(currentTask)}
 				role={v.role}
 				on:roleClicked={() => (showRoleSelect = true)}
 			/>
@@ -160,20 +161,20 @@
 						<div class="box">
 							<p>{currentTask.description}</p>
 						</div>
-					{:else if !data.user.isRoomAdmin}<p class="mb-2">⏳ Waiting for the next task ⏳</p>
+					{:else if !data.user.isRoomAdmin}<p class="mb-2">⏳ Waiting for a next task ⏳</p>
 					{/if}
 				{/if}
 			</div>
 		</div>
 
-		{#if currentTask && !currentTask?.vote}
+		{#if currentTask && !currentTask?.vote && !isObserver(myRole)}
 			<div class="columns">
 				<div class="column">
 					<form action="?/vote" method="POST" use:enhance>
 						<input type="hidden" name="room_id" id="room_id" value={data.room.id} />
 						<input type="hidden" name="vote" id="vote" value={myVote} />
 						<div class="has-text-centered">
-							{#each numbers as n (n)}
+							{#each voteOptions as n (n)}
 								<button
 									class="button m-2"
 									class:is-active={myVote === n}
@@ -190,7 +191,7 @@
 			<div class="columns">
 				<div class="column">
 					{#if !currentTask || currentTask?.vote}
-						<form action="?/addTask" method="post" use:enhance on:keypress={submitOnAltEnter}>
+						<form action="?/addTask" method="POST" use:enhance on:keypress={submitOnAltEnter}>
 							<input type="hidden" name="room_id" value={data.room.id} />
 							<textarea
 								class="textarea"
@@ -204,10 +205,10 @@
 							<button class="button mt-3">Let's go!</button>
 						</form>
 					{:else}
-						<form action="?/endVote" method="post" use:enhance class="has-text-centered">
+						<form action="?/endVote" method="POST" use:enhance class="has-text-centered">
 							<input type="hidden" name="room_id" value={data.room.id} />
 							<input type="hidden" name="task_id" value={data.tasks.at(-1)?.id} />
-							<button class="button is-danger">Stop voting</button>
+							<button class="button is-danger">Finish voting</button>
 							{#if form?.endVote?.error}
 								<p class="has-text-danger">{form.endVote.error}</p>
 							{/if}
@@ -225,8 +226,13 @@
 			<div class="box">
 				<p>
 					{task.description}
-					{#if task.vote} 👉 {task.vote} points{/if}
 				</p>
+				{#if task.voteByRole?.dev}
+					<p>Dev - {task.voteByRole.dev} points</p>
+				{/if}
+				{#if task.voteByRole?.qa}
+					<p>QA - {task.voteByRole.qa} points</p>
+				{/if}
 			</div>
 		{/each}
 	</div>

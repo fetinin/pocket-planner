@@ -39,10 +39,11 @@ export type RoomsRecord = {
 	public_id?: string
 }
 
-export type RoomsTasksRecord = {
+export type RoomsTasksRecord<Tvote_by_role = unknown> = {
 	description: string
 	vote?: number
 	room_id: RecordIdString
+	vote_by_role?: null | Tvote_by_role
 }
 
 export enum RoomsVotersRoleOptions {
@@ -68,10 +69,12 @@ export type VotersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type RoomsResponse<Texpand = unknown> = RoomsRecord & BaseSystemFields<Texpand>
-export type RoomsTasksResponse<Texpand = unknown> = RoomsTasksRecord & BaseSystemFields<Texpand>
+export type RoomsTasksResponse<Tvote_by_role = unknown, Texpand = unknown> = RoomsTasksRecord<Tvote_by_role> & BaseSystemFields<Texpand>
 export type RoomsVotersResponse<Texpand = unknown> = RoomsVotersRecord & BaseSystemFields<Texpand>
 export type UsersResponse = UsersRecord & AuthSystemFields
 export type VotersResponse = VotersRecord & BaseSystemFields
+
+// Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
 	rooms: RoomsRecord
@@ -79,4 +82,12 @@ export type CollectionRecords = {
 	rooms_voters: RoomsVotersRecord
 	users: UsersRecord
 	voters: VotersRecord
+}
+
+export type CollectionResponses = {
+	rooms: RoomsResponse
+	rooms_tasks: RoomsTasksResponse
+	rooms_voters: RoomsVotersResponse
+	users: UsersResponse
+	voters: VotersResponse
 }

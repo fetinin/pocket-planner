@@ -65,6 +65,7 @@
 				"options": {
 					"collectionId": "r25pd3ot3lf87e3",
 					"cascadeDelete": true,
+					"minSelect": null,
 					"maxSelect": 1,
 					"displayFields": null
 				}
@@ -131,9 +132,19 @@
 				"options": {
 					"collectionId": "91bwt8zjwnoi4lp",
 					"cascadeDelete": false,
+					"minSelect": null,
 					"maxSelect": 1,
 					"displayFields": null
 				}
+			},
+			{
+				"id": "15oveckd",
+				"name": "vote_by_role",
+				"type": "json",
+				"system": false,
+				"required": false,
+				"unique": false,
+				"options": {}
 			}
 		],
 		"listRule": "",
@@ -186,6 +197,7 @@
 				"options": {
 					"collectionId": "r25pd3ot3lf87e3",
 					"cascadeDelete": false,
+					"minSelect": null,
 					"maxSelect": 1,
 					"displayFields": null
 				}
@@ -200,6 +212,7 @@
 				"options": {
 					"collectionId": "91bwt8zjwnoi4lp",
 					"cascadeDelete": true,
+					"minSelect": null,
 					"maxSelect": 1,
 					"displayFields": null
 				}
