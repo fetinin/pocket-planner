@@ -8,7 +8,6 @@
 	export let isYou: boolean;
 	export let isVotingPhase: boolean;
 	export let role: RoomsVotersRoleOptions | undefined;
-	console.log('voter', nickname, vote);
 
 	function roleAsIcon(role?: string): string {
 		switch (role) {

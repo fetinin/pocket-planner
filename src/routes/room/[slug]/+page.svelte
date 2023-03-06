@@ -9,6 +9,9 @@
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
 	import Avatar from './Avatar.svelte';
+	import { crossfade } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
+	import { quintOut } from 'svelte/easing';
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
 
 	export let data: PageServerData;
@@ -27,6 +30,7 @@
 	];
 	export let myRole = voters.find((v) => v.id == data.user.id)?.role;
 	export let showRoleSelect = !myRole;
+	const [send, receive] = crossfade({ duration: (d) => Math.sqrt(d * 200) });
 
 	function roleAsText(role?: string): string {
 		switch (role) {
@@ -96,7 +100,7 @@
 
 <div class="columns is-multiline is-centered">
 	{#each voters as v (v.id)}
-		<div class="column is-one-quarter">
+		<div class="column is-one-quarter" animate:flip={{ duration: 400, easing: quintOut }}>
 			<Avatar
 				nickname={v.nickname}
 				isYou={v.id === data.user.id}
