@@ -9,7 +9,7 @@
 	import type { UnsubscribeFunc } from 'pocketbase';
 	import { enhance } from '$app/forms';
 	import Avatar from './Avatar.svelte';
-	import { slide } from 'svelte/transition';
+	import { slide, crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
@@ -20,6 +20,7 @@
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
 
 	export let form: ActionData;
+	const [send, receive] = crossfade({ duration: 200 });
 
 	export const voteOptions = [1, 2, 3, 4, 6, 8, 12, 16, 20, 24, 32, 40, 100500];
 
@@ -157,15 +158,15 @@
 							⏳ Please wait room admin to start ⏳
 						{/if}
 					</p>
-				{/if}
-				{#if currentTask}
-					{#if !currentTask.vote}
+				{:else if !currentTask.vote}
+					<span out:send={{ key: currentTask.id }}>
 						<p class="mb-2">Voting for👇</p>
 						<div class="box">
 							<p>{currentTask.description}</p>
 						</div>
-					{:else if !data.user.isRoomAdmin}<p class="mb-2">⏳ Waiting for a next task ⏳</p>
-					{/if}
+					</span>
+				{:else if !data.user.isRoomAdmin}
+					<p class="mb-2">⏳ Waiting for a next task ⏳</p>
 				{/if}
 			</div>
 		</div>
@@ -226,7 +227,11 @@
 <div class="columns is-centered">
 	<div class="column is-half">
 		{#each data.tasks.filter((t) => t.vote).reverse() as task (task.id)}
-			<div class="box">
+			<div
+				class="box"
+				in:receive={{ key: task.id, duration: 300 }}
+				animate:flip={{ duration: 200 }}
+			>
 				<p>
 					{task.description}
 				</p>
