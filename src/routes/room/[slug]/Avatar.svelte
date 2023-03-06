@@ -52,14 +52,14 @@
 			</div>
 		</div>
 
-		{#if !isObserver(role)}
-			<p class="has-text-centered">
+		<p class="has-text-centered">
+			{#if !isObserver(role)}
 				{#if isVotingPhase}
 					{#if vote}✅{:else}🤔{/if}
 				{:else if vote}{vote}
 				{/if}
-			</p>
-		{/if}
+			{/if}
+		</p>
 	</div>
 </div>
 
@@ -67,5 +67,8 @@
 	button.role {
 		all: unset;
 		cursor: pointer;
+	}
+	.card {
+		height: 100%;
 	}
 </style>

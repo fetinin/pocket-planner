@@ -97,7 +97,7 @@
 	</div>
 </div>
 
-<div class="columns is-multiline is-centered">
+<div class="columns is-multiline is-centered voters">
 	{#each voters as v (v.id)}
 		<div class="column is-one-quarter" animate:flip={{ duration: 400, easing: quintOut }}>
 			<Avatar
@@ -106,7 +106,7 @@
 				vote={v.vote}
 				isVotingPhase={Boolean(currentTask)}
 				role={v.role}
-				on:roleClicked={() => (showRoleSelect = true)}
+				on:roleClicked={() => (showRoleSelect = !showRoleSelect)}
 			/>
 		</div>
 	{/each}
@@ -240,3 +240,9 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	.voters .column {
+		min-width: 300px;
+	}
+</style>
