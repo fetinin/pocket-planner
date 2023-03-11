@@ -39,8 +39,7 @@ export const actions: Actions = {
 			room_id: room.id,
 			voter_id: userID
 		});
-		{
-		}
+
 		throw redirect(303, `/room/${roomNumber}`);
 	}
 };
