@@ -13,6 +13,7 @@
 	import { flip } from 'svelte/animate';
 	import { quintOut } from 'svelte/easing';
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
+	import CopyOnClick from './CopyOnClick.svelte';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
@@ -94,7 +95,9 @@
 
 <div class="columns">
 	<div class="column">
-		<h1>Room: {$page.params.slug}</h1>
+		<h1>
+			Room: <CopyOnClick content={$page.params.slug} textToCopy={$page.url.href} />
+		</h1>
 	</div>
 </div>
 
