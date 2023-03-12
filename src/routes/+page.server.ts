@@ -30,7 +30,7 @@ export const actions: Actions = {
 			userID = await createNewUser(cookies);
 		}
 
-		const roomNumber = (Math.random() * 10000).toFixed(0);
+		const roomNumber = (Math.random() * (10000 - 1000) + 1000).toFixed(0);
 		const room = await pb
 			.collection(Collections.Rooms)
 			.create<RoomsResponse>(<RoomsRecord>{ creator_id: userID, public_id: roomNumber });
