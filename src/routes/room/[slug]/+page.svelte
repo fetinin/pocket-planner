@@ -14,11 +14,13 @@
 	import { quintOut } from 'svelte/easing';
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
 	import CopyOnClick from './CopyOnClick.svelte';
+	import { calcCoefficientOfVariation, calStdDeviation, maxVote, minVote } from './votes_stat';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
 	export let myVote = voters.find((v) => v.id == data.user.id)?.vote;
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
+	$: votes = extractVotes(voters);
 
 	export let form: ActionData;
 	const [send, receive] = crossfade({ duration: 200 });
@@ -92,54 +94,14 @@
 		await unsubTasks();
 	});
 
-	function minVote(voters: import('./proxy+page.server').Voter[]): number {
-		const votes = voters.map((v) => v.vote).filter(notUndefined);
-		if (!votes.length) return 0;
+	function extractVotes(voters: import('./proxy+page.server').Voter[]): number[] {
+		const votes = voters
+			.map((v) => v.vote)
+			.filter(notUndefined)
+			.filter((v) => v !== 0);
+		if (!votes.length) return [];
 
-		return Math.min(...votes);
-	}
-
-	function maxVote(voters: import('./proxy+page.server').Voter[]): number {
-		const votes = voters.map((v) => v.vote).filter(notUndefined);
-		if (!votes.length) return 0;
-
-		return Math.max(...votes);
-	}
-
-	function calStdDeviation(voters: import('./proxy+page.server').Voter[]): number {
-		const votes = voters.map((v) => v.vote).filter(notUndefined);
-		if (!votes.length) return 0;
-
-		// For the given votes of 3, 8, 10, 3:
-		// 1. Calculate the mean: `(3 + 8 + 10 + 3) / 4 = 6`
-		const mean = votes.reduce((p, c) => p + c) / votes.length;
-		console.log('std deviation', 'mean', mean);
-
-		// 2. Calculate the variance: `((3-6)² + (8-6)² + (10-6)² + (3-6)²) / 4 = 10`
-		const variance = votes.map((v) => Math.pow(v - mean, 2)).reduce((p, n) => p + n) / votes.length;
-		console.log('std deviation', 'variance', variance);
-
-		// 3. Calculate the standard deviation: `sqrt(10) ≈ 3.16`
-		return Math.sqrt(variance);
-	}
-
-	function calcCoefficientOfVariation(voters: import('./proxy+page.server').Voter[]): number {
-		const votes = voters.map((v) => v.vote).filter(notUndefined);
-		if (!votes.length) return 0;
-
-		// So, for the given votes of 3, 8, 10, 3:
-
-		// 1. Calculate the mean: `(3 + 8 + 10 + 3) / 4 = 6`
-		const mean = votes.reduce((p, c) => p + c) / votes.length;
-		console.log('CoefficientOfVariation', 'mean', mean);
-
-		// 2. Calculate the standard deviation: `sqrt(10) ≈ 3.16`
-		const variance = votes.map((v) => Math.pow(v - mean, 2)).reduce((p, n) => p + n) / votes.length;
-		const stdDeviation = Math.sqrt(variance);
-		console.log('CoefficientOfVariation', 'variance', variance);
-
-		// 3. Calculate the coefficient of variation: `3.16 / 6 ≈ 0.53`
-		return stdDeviation / mean;
+		return votes;
 	}
 
 	function notUndefined<T>(x: T | undefined): x is T {
@@ -287,9 +249,9 @@
 			<div class="box">
 				<p class="is-size-5">Votes statistics:</p>
 				<!-- votes: {#each voters as v (v.id)}{v.vote}{/each} -->
-				min, max: {minVote(voters)}, {maxVote(voters)}<br />
-				Std. deviation: {calStdDeviation(voters)}<br />
-				Coefficient of variation: {calcCoefficientOfVariation(voters)}
+				min, max: {minVote(votes).toFixed(2)}, {maxVote(votes).toFixed(2)}<br />
+				Std. deviation: {calStdDeviation(votes).toFixed(2)}<br />
+				Coefficient of variation: {calcCoefficientOfVariation(votes).toFixed(2)}
 			</div>
 		</div>
 	</div>
