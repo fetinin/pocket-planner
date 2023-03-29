@@ -15,12 +15,15 @@
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
 	import CopyOnClick from './CopyOnClick.svelte';
 	import { calcCoefficientOfVariation, calStdDeviation, maxVote, minVote } from './votes_stat';
+	import VoteStats from './VoteStats.svelte';
+	import type { Voter } from './+page.server';
 
 	export let data: PageServerData;
 	export let voters = data.voters;
 	export let myVote = voters.find((v) => v.id == data.user.id)?.vote;
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
 	$: votes = extractVotes(voters);
+	$: votesByRole = mapVotesByRole(voters);
 
 	export let form: ActionData;
 	const [send, receive] = crossfade({ duration: 200 });
@@ -34,6 +37,20 @@
 	];
 	export let myRole = voters.find((v) => v.id == data.user.id)?.role;
 	export let showRoleSelect = !myRole;
+
+	function mapVotesByRole(voters: Voter[]) {
+		const votesByRole = new Map<keyof typeof RoomsVotersRoleOptions, number[]>();
+
+		for (const voter of voters) {
+			if (!voter.vote || !voter.role) continue;
+
+			const votes = votesByRole.get(voter.role) || [];
+			votes.push(voter.vote);
+
+			votesByRole.set(voter.role, votes);
+		}
+		return votesByRole;
+	}
 
 	function roleAsText(role?: string): string {
 		switch (role) {
@@ -94,7 +111,7 @@
 		await unsubTasks();
 	});
 
-	function extractVotes(voters: import('./proxy+page.server').Voter[]): number[] {
+	function extractVotes(voters: PageServerData['voters']): number[] {
 		const votes = voters
 			.map((v) => v.vote)
 			.filter(notUndefined)
@@ -245,14 +262,10 @@
 
 {#if currentTask?.vote}
 	<div class="columns is-centered">
-		<div class="column is-half">
-			<div class="box">
-				<p class="is-size-5">Votes statistics:</p>
-				<!-- votes: {#each voters as v (v.id)}{v.vote}{/each} -->
-				min, max: {minVote(votes).toFixed(2)}, {maxVote(votes).toFixed(2)}<br />
-				Std. deviation: {calStdDeviation(votes).toFixed(2)}<br />
-				Coefficient of variation: {calcCoefficientOfVariation(votes).toFixed(2)}
-			</div>
+		<div class="column is-one-quarter">
+			{#each [...votesByRole] as [role, votes] (role)}
+				<VoteStats role={roleAsText(role)} {votes} />
+			{/each}
 		</div>
 	</div>
 {/if}
