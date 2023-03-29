@@ -262,11 +262,11 @@
 
 {#if currentTask?.vote}
 	<div class="columns is-centered">
-		<div class="column is-one-quarter">
-			{#each [...votesByRole] as [role, votes] (role)}
+		{#each [...votesByRole] as [role, votes] (role)}
+			<div class="column is-one-quarter">
 				<VoteStats role={roleAsText(role)} {votes} />
-			{/each}
-		</div>
+			</div>
+		{/each}
 	</div>
 {/if}
 
