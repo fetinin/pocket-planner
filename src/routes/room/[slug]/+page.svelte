@@ -14,7 +14,6 @@
 	import { quintOut } from 'svelte/easing';
 	import { handleTasksUpdate, handleVotersUpdate } from './subscription_handlers';
 	import CopyOnClick from './CopyOnClick.svelte';
-	import { calcCoefficientOfVariation, calStdDeviation, maxVote, minVote } from './votes_stat';
 	import VoteStats from './VoteStats.svelte';
 	import type { Voter } from './+page.server';
 
@@ -22,7 +21,6 @@
 	export let voters = data.voters;
 	export let myVote = voters.find((v) => v.id == data.user.id)?.vote;
 	$: currentTask = data.tasks.length ? data.tasks.at(-1) : undefined;
-	$: votes = extractVotes(voters);
 	$: votesByRole = mapVotesByRole(voters);
 
 	export let form: ActionData;
@@ -110,20 +108,6 @@
 		await unsubVoters();
 		await unsubTasks();
 	});
-
-	function extractVotes(voters: PageServerData['voters']): number[] {
-		const votes = voters
-			.map((v) => v.vote)
-			.filter(notUndefined)
-			.filter((v) => v !== 0);
-		if (!votes.length) return [];
-
-		return votes;
-	}
-
-	function notUndefined<T>(x: T | undefined): x is T {
-		return x !== undefined;
-	}
 </script>
 
 <div class="columns">
@@ -159,7 +143,7 @@
 						action="?/setRole"
 						method="POST"
 						use:enhance
-						on:submit={(e) => {
+						on:submit={() => {
 							showRoleSelect = false;
 						}}
 					>
