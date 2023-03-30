@@ -284,3 +284,24 @@ export function calcInterquartileRange(values: number[]): number {
 	// Calculate the IQR
 	return upperHalfMedian - lowerHalfMedian;
 }
+
+export function calculateAgreementLevel(estimations: number[]): number {
+	if (!estimations.length) return 0;
+
+	const frequencyMap = new Map<number, number>();
+
+	for (const estimation of estimations) {
+		const estimationCount = frequencyMap.get(estimation);
+		if (!estimationCount) {
+			frequencyMap.set(estimation, 1);
+			continue;
+		}
+
+		frequencyMap.set(estimation, estimationCount + 1);
+	}
+
+	const mostFrequentCount = Math.max(...frequencyMap.values());
+	if (mostFrequentCount === 1) return 0;
+
+	return mostFrequentCount / estimations.length;
+}

@@ -5,6 +5,7 @@ import {
 	calcInterquartileRange,
 	calcMean,
 	calcMedian,
+	calculateAgreementLevel,
 	calStdDeviation,
 	maxVote,
 	minVote
@@ -98,3 +99,28 @@ test('calcInterquartileRange', () => {
 // 	// expect(kendallsW([3, 3, 3, 3])).toBe(1);
 // 	expect(kendallsW([2, 3, 3, 2])).toBe(1);
 // });
+
+test('should return 0.5 for [2, 3, 4, 3]', () => {
+	const estimations = [2, 3, 4, 3];
+	expect(calculateAgreementLevel(estimations)).toBe(0.5);
+});
+
+test('should return 1 for [3, 3, 3, 3]', () => {
+	const estimations = [3, 3, 3, 3];
+	expect(calculateAgreementLevel(estimations)).toBe(1);
+});
+
+test('should return 0 for [1, 2, 3, 4]', () => {
+	const estimations = [1, 2, 3, 4];
+	expect(calculateAgreementLevel(estimations)).toBe(0);
+});
+
+test('should return 0.75 for [2, 2, 2, 3]', () => {
+	const estimations = [2, 2, 2, 3];
+	expect(calculateAgreementLevel(estimations)).toBe(0.75);
+});
+
+test('should return 0 for an empty array', () => {
+	const estimations: number[] = [];
+	expect(calculateAgreementLevel(estimations)).toBe(0);
+});
