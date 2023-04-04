@@ -2,6 +2,7 @@ import { pb } from '$lib/store/pb';
 import { Collections, RoomsVotersRoleOptions } from '$lib/store/types';
 import { createNewUser, getUserID, logout } from '$lib/user';
 
+import { wrapLoadWithSentry } from '@sentry/sveltekit';
 import { error, fail } from '@sveltejs/kit';
 
 import type { Actions } from '@sveltejs/kit';
@@ -31,7 +32,7 @@ export type Task = {
 };
 export type VoteByRole = { [key in keyof typeof RoomsVotersRoleOptions]: number };
 
-export const load = (async ({ params, cookies }) => {
+export const load = wrapLoadWithSentry(async ({ params, cookies }) => {
 	let userID = getUserID(cookies);
 	if (!userID) {
 		userID = await createNewUser(cookies);
