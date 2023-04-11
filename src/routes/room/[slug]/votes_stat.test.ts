@@ -84,275 +84,131 @@ test('calcInterquartileRange', () => {
 describe('calculates agreement level correctly', () => {
 	describe('estimations = [2, 3, 4, 3]', () => {
 		const estimations = [2, 3, 4, 3];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0.5);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0.5);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(0.75); // good
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.76, 2);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.29, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBe(0.5);
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBeCloseTo(0.8, 1);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(0.5);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.5);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.76, 2); // good
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.63, 1);
 		});
 	});
 
 	describe('everyone agreed', () => {
 		const estimations = [1, 1, 1, 1];
-		test('calc agreement level ver 1', ({ expect }) => {
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(1);
+		});
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBe(1);
+		});
+		test('calc agreement level', ({ expect }) => {
 			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBe(1);
 		});
 	});
 
 	describe('No one agreed, votes are not far spread apart', () => {
 		const estimations = [1, 2, 3, 4];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBeCloseTo(0.66, 1);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.55, 2);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.25, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBeCloseTo(0.33, 2); // good
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBeCloseTo(0.69, 2);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBeCloseTo(0.33, 2); // good
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.625);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.55, 2);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.27, 1);
 		});
 	});
 
 	describe('Voters estimations are split into two groups', () => {
 		const estimations = [2, 2, 4, 4];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0.5);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0.5);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(0.5);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.666, 2);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBe(0); // good
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBe(0); // good
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBe(0.75);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(0); // good
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.75);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.666, 2);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.58, 2);
 		});
 	});
 
 	describe('Everyone agreed except one', () => {
 		const estimations = [6, 6, 6, 8];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0.75);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0.75);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(0.625); // good
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.866, 2);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.13, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBeCloseTo(0.25, 2);
-		});
-		test('calc agreement level new', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevelNew(estimations)).toBeCloseTo(0.625, 2);
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBeCloseTo(0.88, 2);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBeCloseTo(0.25, 2);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.5);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.866, 2);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.78, 1);
 		});
 	});
 
 	describe('Everyone agreed except one, who is strongly disagreed', () => {
 		const estimations = [6, 6, 6, 20];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0.75);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0.75);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(0.625);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.36, 2);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.13, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBeCloseTo(0.25, 2);
-		});
-		test('calc agreement level new', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevelNew(estimations)).toBeCloseTo(0.625, 2);
-		});
-		test('calc agreement level ver 5', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel5(estimations)).toBeCloseTo(0.61, 2);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(0.25);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.5);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.36, 2); // good
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.55, 1);
 		});
 	});
 
 	describe('Single vote', () => {
 		const estimations = [4];
-		test('calc agreement level ver 1', ({ expect }) => {
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(1);
+		});
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBe(1);
+		});
+		test('calc agreement level', ({ expect }) => {
 			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(1);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBe(1);
 		});
 	});
 
 	describe('Two voters disagreed', () => {
 		const estimations = [4, 6];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBe(0.5);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBe(0.8);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBe(0);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBe(0);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBe(0);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBe(0.75);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBe(0.8);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0.4);
 		});
 	});
 
 	describe('Four voters disagreed', () => {
 		const estimations = [4, 8, 6, 12];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBeCloseTo(0.68, 1);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.6, 1);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.26, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBeCloseTo(0.375, 2);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBeCloseTo(0.375, 2);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBeCloseTo(0.6, 2);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.6, 1);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.3, 1);
 		});
 	});
 
-	describe('One thought this will take longer, one disagreed', () => {
+	describe('One thought this will take less, one disagreed', () => {
 		const estimations = [8, 8, 6, 16];
-		test('calc agreement level ver 1', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel(estimations)).toBe(0);
+		test('calc agreement percent', ({ expect }) => {
+			expect(votes_stat.calculatePercentAgreed(estimations)).toBe(0.5);
 		});
-		test('calc agreement level ver 2', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel2(estimations)).toBeCloseTo(0.68, 1);
+		test('calc normilized CV', ({ expect }) => {
+			expect(votes_stat.calculateCVNormilized(estimations)).toBeCloseTo(0.6, 1);
 		});
-		test('calc agreement level ver 3', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel3(estimations)).toBeCloseTo(0.26, 2);
-		});
-		test('calc agreement level ver 4', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel4(estimations)).toBeCloseTo(0.375, 2);
-		});
-		test('calc agreement level ver 6', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel6(estimations)).toBeCloseTo(0.375, 2);
-		});
-		test('calc agreement level ver 7', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel7(estimations)).toBeCloseTo(0.6, 2);
-		});
-		test('calc agreement level ver 8', ({ expect }) => {
-			expect(votes_stat.calculateAgreementLevel8(estimations)).toBeCloseTo(0.6, 1);
+		test('calc agreement level', ({ expect }) => {
+			expect(votes_stat.calculateAgreementLevel(estimations)).toBeCloseTo(0.54, 1);
 		});
 	});
 });

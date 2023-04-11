@@ -282,14 +282,7 @@ export function kendallsW2(estimations: number[]): number {
 }
 
 /*
-	To calculate the IQR, you first need to sort the estimates in ascending order: 2, 3, 3, 4.
-	Then, you find the median of the data set, which is the middle value: 3.
-	Next, you find the median of the lower half of the data set (the values less than or equal to the median), which is 2.5.
-	Finally, you find the median of the upper half of the data set (the values greater than or equal to the median), 
-	which is 3.5. The IQR is the difference between the upper and lower quartiles: 3.5 - 2.5 = 1.
 	The IQR provides a measure of the spread of the data and can be used as a rough indicator of agreement.
-	In this case, the IQR is relatively small (1 hour),
-	which suggests that the developers are in moderate agreement about the estimated time to complete the task.
 	However, it is important to note that the IQR is not a formal statistical measure of agreement and 
 	does not take into account the level of agreement that could be expected by chance.
 */
@@ -308,7 +301,11 @@ export function calcInterquartileRange(values: number[]): number {
 	return upperHalfMedian - lowerHalfMedian;
 }
 
-export function calculateAgreementLevel(estimations: number[]): number {
+/* 
+	Calculates the level of agreement among a group of estimations based 
+	on the frequency of the most common estimation
+*/
+export function calculatePercentAgreed(estimations: number[]): number {
 	if (!estimations.length) return 0;
 	if (estimations.length === 1) return 1;
 
@@ -330,187 +327,19 @@ export function calculateAgreementLevel(estimations: number[]): number {
 	return mostFrequentCount / estimations.length;
 }
 
-// // Example usage:
-// const estimations = [2, 3, 4, 3];
-// const agreementLevel = calculateAverageDeviation(estimations);
-// console.log(agreementLevel); // Output: 0.5
-export function calculateAgreementLevel2(estimations: number[]): number {
-	if (!estimations.length) return 1;
-	// Calculate the mean of the estimations
-	const mean = estimations.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the absolute differences between each estimation and the mean
-	const absoluteDifferences = estimations.map((estimation) => Math.abs(estimation - mean));
-
-	// Calculate the average deviation
-	const averageDeviation =
-		absoluteDifferences.reduce((sum, current) => sum + current, 0) / estimations.length;
-	// Everyone agreed!
-	if (averageDeviation === 0) return 1;
-
-	// Calculate the max possible deviation (equal to the range of the estimations)
-	const maxPossibleDeviation = Math.max(...estimations) - Math.min(...estimations);
-
-	// Normalize the average deviation
-	const normalizedAverageDeviation = averageDeviation / maxPossibleDeviation;
-
-	// Calculate the agreement level
-	const agreementLevel = 1 - normalizedAverageDeviation;
-
-	return agreementLevel;
-}
-
-export function calculateAgreementLevel3(estimations: number[]): number {
-	// Calculate the mean of the estimations
-	const mean = estimations.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the squared differences between each estimation and the mean
-	const squaredDifferences = estimations.map((estimation) => Math.pow(estimation - mean, 2));
-
-	// Calculate the variance
-	const variance =
-		squaredDifferences.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the standard deviation
-	const standardDeviation = Math.sqrt(variance);
-	// Everyone agreed!
-	if (standardDeviation === 0) return 1;
-
-	// Calculate the max possible standard deviation (equal to half of the range of the estimations)
-	const maxPossibleStandardDeviation = (Math.max(...estimations) - Math.min(...estimations)) / 2;
-
-	// Normalize the standard deviation
-	const normalizedStandardDeviation = standardDeviation / maxPossibleStandardDeviation;
-
-	// Calculate the agreement level
-	const agreementLevel = 1 - normalizedStandardDeviation;
-
-	return agreementLevel;
-}
-
-export function calculateAgreementLevel4(estimations: number[]): number {
-	// Calculate the mean of the estimations
-	const mean = estimations.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the absolute differences between each estimation and the mean
-	const absoluteDifferences = estimations.map((estimation) => Math.abs(estimation - mean));
-
-	// Calculate the average absolute deviation
-	const averageAbsoluteDeviation =
-		absoluteDifferences.reduce((sum, current) => sum + current, 0) / estimations.length;
-	// Everyone agreed!
-	if (averageAbsoluteDeviation === 0) return 1;
-
-	// Calculate the max possible absolute deviation (equal to half of the range of the estimations)
-	const maxPossibleAbsoluteDeviation = (Math.max(...estimations) - Math.min(...estimations)) / 2;
-
-	// Normalize the average absolute deviation
-	const normalizedAverageAbsoluteDeviation =
-		averageAbsoluteDeviation / maxPossibleAbsoluteDeviation;
-
-	// Calculate the agreement level
-	const agreementLevel = 1 - normalizedAverageAbsoluteDeviation;
-
-	return agreementLevel;
-}
-
-export function calculateAgreementLevelNew(estimations: number[]): number {
-	// Calculate the mean of the estimations
-	const mean = estimations.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the absolute differences between each estimation and the mean
-	const absoluteDifferences = estimations.map((estimation) => Math.abs(estimation - mean));
-
-	// Calculate the average absolute deviation
-	const averageAbsoluteDeviation =
-		absoluteDifferences.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the max possible sum of absolute deviations using the maximum and minimum values in the estimations
-	const maxEstimation = Math.max(...estimations);
-	const minEstimation = Math.min(...estimations);
-	const maxPossibleSumAbsoluteDeviation = estimations.length * (maxEstimation - minEstimation);
-
-	// Normalize the average absolute deviation
-	const normalizedAverageAbsoluteDeviation =
-		averageAbsoluteDeviation / (maxPossibleSumAbsoluteDeviation / estimations.length);
-
-	// Calculate the agreement level
-	const agreementLevel = 1 - normalizedAverageAbsoluteDeviation;
-
-	return agreementLevel;
-}
-
-export function calculateAgreementLevel5(estimates: number[]): number {
-	if (estimates.length === 0) return 0;
-
-	const mean = estimates.reduce((sum, value) => sum + value, 0) / estimates.length;
-	const variance =
-		estimates.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / estimates.length;
-	const stdDev = Math.sqrt(variance);
-	const cv = stdDev / mean;
-	return 1 - cv / (1 + cv);
-}
-
-export function calculateAgreementLevel6(estimations: number[]): number {
-	if (!estimations.length) return 1;
-	// Calculate the mean of the estimations
-	const mean = estimations.reduce((sum, current) => sum + current, 0) / estimations.length;
-
-	// Calculate the absolute differences between each estimation and the mean
-	const absoluteDifferences = estimations.map((estimation) => Math.abs(estimation - mean));
-
-	// Calculate the average deviation
-	const averageDeviation =
-		absoluteDifferences.reduce((sum, current) => sum + current, 0) / estimations.length;
-	// Everyone agreed!
-	if (averageDeviation === 0) return 1;
-
-	// Calculate the max possible deviation (equal to the range of the estimations)
-	const maxPossibleDeviation = (Math.max(...estimations) - Math.min(...estimations)) / 2;
-
-	// Calculate the agreement level
-	const agreementLevel = 1 - averageDeviation / maxPossibleDeviation;
-
-	return agreementLevel;
-}
-
-// calculates Normalized Range using IQR for max possible range
-export function calculateAgreementLevel7(estimates: number[]): number {
-	if (estimates.length < 2) {
-		return 1;
-	}
-
-	estimates.sort((a, b) => a - b);
-
-	const median = (arr: number[]): number => {
-		const mid = Math.floor(arr.length / 2);
-		return arr.length % 2 === 0 ? (arr[mid - 1] + arr[mid]) / 2 : arr[mid];
-	};
-
-	const q1 = median(estimates.slice(0, Math.floor(estimates.length / 2)));
-	const q3 = median(estimates.slice(Math.ceil(estimates.length / 2)));
-	const iqr = q3 - q1;
-	// everyone agreed
-	if (iqr === 0) return 1;
-
-	const lowerBound = q1 - 1.5 * iqr;
-	const upperBound = q3 + 1.5 * iqr;
-
-	const range = estimates[estimates.length - 1] - estimates[0];
-	const maxPossibleRange = upperBound - lowerBound;
-
-	const normalizedRange = range / maxPossibleRange;
-
-	return 1 - normalizedRange;
-}
-
 /* 
 	A modified version of the Coefficient of Variation (CV) method,
 	which takes the standard deviation and mean into account. 
 	By normalizing the standard deviation by the mean, we can capture the 
 	relative variability of the estimates.
+	
+	Coefficient of variation (CV) is a math thing that helps us understand how spread out some numbers are. 
+	It compares how much the numbers are different from each other (that's called "variability") to how big the 
+	numbers are on average. If the numbers are very different from each other compared to how big they are on average, 
+	the CV will be high. If the numbers are pretty similar to each other compared to how big they are on average, 
+	the CV will be low.
 */
-export function calculateAgreementLevel8(estimates: number[]): number {
+export function calculateCVNormilized(estimates: number[]): number {
 	if (estimates.length < 2) return 1;
 
 	const mean = estimates.reduce((sum, value) => sum + value, 0) / estimates.length;
@@ -523,4 +352,11 @@ export function calculateAgreementLevel8(estimates: number[]): number {
 	const normalizedCV = Math.min(coefficientOfVariation, 1);
 
 	return 1 - normalizedCV;
+}
+
+export function calculateAgreementLevel(estimates: number[]): number {
+	const agreedWithEachOther = calculatePercentAgreed(estimates);
+	const normalizedCV = calculateCVNormilized(estimates);
+
+	return (agreedWithEachOther + normalizedCV) / 2;
 }
