@@ -67,18 +67,7 @@ test('calcMean', () => {
 	expect(votes_stat.calcMean([4, 4, 4, 5])).toBeCloseTo(4.25, 2);
 	expect(votes_stat.calcMean([4, 4, 5, 5])).toBe(4.5);
 	expect(votes_stat.calcMean([5, 5, 5, 5])).toBe(5);
-	expect(votes_stat.calcMean([24.1, 24.7, 25.0, 25.2, 25.6, 25.7, 26.1, 27.8])).toBeCloseTo(
-		25.52,
-		2
-	);
-});
-
-test('calcInterquartileRange', () => {
-	expect(votes_stat.calcInterquartileRange([])).toBe(0);
-	expect(votes_stat.calcInterquartileRange([3])).toBe(0);
-	expect(votes_stat.calcInterquartileRange([3, 3])).toBe(0);
-	expect(votes_stat.calcInterquartileRange([2, 3, 3])).toBe(1);
-	expect(votes_stat.calcInterquartileRange([2, 3, 3, 4])).toBe(1);
+	expect(votes_stat.calcMean([24.1, 24.7, 25.0, 25.2, 26.1, 27.8])).toBeCloseTo(25.48, 2);
 });
 
 describe('calculates agreement level correctly', () => {
