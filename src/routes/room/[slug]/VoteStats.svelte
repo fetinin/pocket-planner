@@ -1,11 +1,5 @@
 <script lang="ts">
-	import {
-		calcCoefficientOfVariation,
-		calcInterquartileRange,
-		calStdDeviation,
-		maxVote,
-		minVote
-	} from './votes_stat';
+	import { calcCoefficientOfVariation, calStdDeviation, maxVote, minVote } from './votes_stat';
 
 	export let role: string;
 	export let votes: number[];
@@ -25,13 +19,13 @@
 		{role}
 	</div>
 	<div>
+		<p>👍</p>
 		Votes: {shuffleVotes(votes)}<br />
 		Min, Max: {minVote(votes).toFixed(2)}, {maxVote(votes).toFixed(2)}<br />
 		Mean: {votes.reduce((a, b) => a + b, 0) / votes.length || 0}<br />
 		Median: {votes.sort((a, b) => a - b)[Math.floor(votes.length / 2)] || 0}<br />
 		Std. deviation: {calStdDeviation(votes).toFixed(2)}<br />
 		Coef. of variation: {calcCoefficientOfVariation(votes).toFixed(2)}
-		IQR: {calcInterquartileRange(votes).toFixed(2)};
 	</div>
 	<!-- <div class="circle">
 		<div class="inner-circle">
