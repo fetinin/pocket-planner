@@ -1,8 +1,24 @@
 <script lang="ts">
-	import { calcCoefficientOfVariation, calStdDeviation, maxVote, minVote } from './votes_stat';
+	import {
+		calculateAgreementLevel,
+		calculateCVNormilized,
+		calculatePercentAgreed,
+		maxVote,
+		minVote,
+		calcMean,
+		calcMedian
+	} from './votes_stat';
 
 	export let role: string;
 	export let votes: number[];
+
+	$: agreementLevel = calculateAgreementLevel(votes);
+	$: extraStatsTooltip = `Min, Max: ${minVote(votes).toFixed(2)}, ${maxVote(votes).toFixed(2)}
+			Mean: ${calcMean(votes).toFixed(2)}
+			Median: ${calcMedian(votes)}
+			Agreement coefficient: ${calculatePercentAgreed(votes).toFixed(2)}
+			Votes variation coefficient: ${calculateCVNormilized(votes).toFixed(2)}
+			Agreement: ${agreementLevel.toFixed(2)}`;
 
 	function shuffleVotes(votes: number[]): number[] {
 		const shuffledVotes = [...votes];
@@ -12,6 +28,19 @@
 		}
 		return shuffledVotes;
 	}
+
+	function agreementRotation(agreement: number) {
+		const agreementDegree = 0 - (1 - agreement) * 180;
+		return `rotate(${agreementDegree}deg)`;
+	}
+
+	function agreementIcon(agreement: number) {
+		if (agreement < 0.2) return '🫠';
+		if (agreement < 0.5) return '🙁';
+		if (agreement < 0.7) return '😐';
+		if (agreement < 0.9) return '😐';
+		return '🤩';
+	}
 </script>
 
 <div class="box">
@@ -19,46 +48,52 @@
 		{role}
 	</div>
 	<div>
-		<p>👍</p>
-		Votes: {shuffleVotes(votes)}<br />
-		Min, Max: {minVote(votes).toFixed(2)}, {maxVote(votes).toFixed(2)}<br />
-		Mean: {votes.reduce((a, b) => a + b, 0) / votes.length || 0}<br />
-		Median: {votes.sort((a, b) => a - b)[Math.floor(votes.length / 2)] || 0}<br />
-		Std. deviation: {calStdDeviation(votes).toFixed(2)}<br />
-		Coef. of variation: {calcCoefficientOfVariation(votes).toFixed(2)}
-	</div>
-	<!-- <div class="circle">
-		<div class="inner-circle">
-			<span class="circle-text">
-				
+		<p class="has-text-centered">
+			<span class="tooltip">
+				<span class="is-size-3 clickable-text">{agreementIcon(agreementLevel)}</span>
+				<span class="tooltiptext">{extraStatsTooltip}</span>
 			</span>
-		</div>
-	</div> -->
+			<span
+				class="is-size-4"
+				style="display: inline-block"
+				style:transform={agreementRotation(agreementLevel)}>👍</span
+			>
+		</p>
+		<p class="has-text-centered">
+			Votes: {shuffleVotes(votes)}<br />
+		</p>
+	</div>
 </div>
 
 <style>
-	/* .circle {
-		width: 200px;
-		height: 200px;
-		border-radius: 50%;
-		background-color: rgb(159, 246, 39);
+	.clickable-text {
+		all: unset;
+		cursor: pointer;
+	}
+	.tooltip {
+		position: relative;
+		display: inline-block;
+		/* border-bottom: 0.5px dashed grey; */
+	}
+
+	.tooltip .tooltiptext {
+		visibility: hidden;
+		width: 250px;
+		background-color: rgba(0, 0, 0, 0.7);
 		color: #fff;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	.inner-circle {
-		width: 170px;
-		height: 170px;
-		border-radius: 50%;
-		background-color: #fff;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	.circle-text {
-		font-size: 0.7rem;
 		text-align: center;
-		color: black;
-	} */
+		padding: 2px 0;
+		border-radius: 6px;
+		left: -3px;
+		top: 90%;
+		font-size: 10pt;
+		white-space: pre-line;
+
+		position: absolute;
+		z-index: 1;
+	}
+
+	.tooltip:hover .tooltiptext {
+		visibility: visible;
+	}
 </style>

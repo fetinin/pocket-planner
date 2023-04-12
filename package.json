@@ -17,7 +17,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.32.3",
 		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.15.2",
+		"@sveltejs/kit": "^1.15.4",
 		"@typescript-eslint/eslint-plugin": "^5.58.0",
 		"@typescript-eslint/parser": "^5.58.0",
 		"eslint": "^8.38.0",
@@ -26,14 +26,14 @@
 		"pocketbase-typegen": "^1.1.7",
 		"prettier": "^2.8.7",
 		"prettier-plugin-svelte": "^2.10.0",
-		"sass": "^1.61.0",
+		"sass": "^1.62.0",
 		"svelte": "^3.58.0",
 		"svelte-check": "^3.2.0",
 		"svelte-preprocess": "^5.0.3",
 		"tslib": "^2.5.0",
 		"typescript": "^5.0.4",
 		"vite": "^4.2.1",
-		"vitest": "^0.30.0"
+		"vitest": "^0.30.1"
 	},
 	"type": "module",
 	"dependencies": {

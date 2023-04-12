@@ -24,5 +24,5 @@ You can preview the production build with `npm run preview`.
 [x] Add roles
 [x] Click on room number to copy it to clipboard
 [] Refactor room voting block to make it easier to animate
-[] Animate loadings 
+[x] Animate loadings 
 [x] Add Sentry support

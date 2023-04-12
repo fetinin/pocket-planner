@@ -11,9 +11,9 @@
 </script>
 
 <div class="tooltip">
-	<button class="clickable-text" on:click={onClick} on:mouseleave={() => (tooltip = 'Copy')}
-		>{content}</button
-	>
+	<button class="clickable-text" on:click={onClick} on:mouseleave={() => (tooltip = 'Copy')}>
+		{content}
+	</button>
 	<span class="tooltiptext">{tooltip}</span>
 </div>
 
@@ -25,7 +25,7 @@
 	.tooltip {
 		position: relative;
 		display: inline-block;
-		border-bottom: 0.5px dashed grey; /* If you want dots under the hoverable text */
+		border-bottom: 0.5px dashed grey;
 	}
 
 	.tooltip .tooltiptext {

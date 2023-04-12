@@ -111,8 +111,12 @@ export function calculateCVNormilized(estimates: number[]): number {
 }
 
 export function calculateAgreementLevel(estimates: number[]): number {
-	const agreedWithEachOther = calculatePercentAgreed(estimates);
+	let agreedWithEachOther = calculatePercentAgreed(estimates);
 	const normalizedCV = calculateCVNormilized(estimates);
+
+	// If there is no agreement, it affects agreement level too much
+	// this allows us to smooth this effect
+	agreedWithEachOther = Math.max(agreedWithEachOther, 0.1);
 
 	return (agreedWithEachOther + normalizedCV) / 2;
 }
