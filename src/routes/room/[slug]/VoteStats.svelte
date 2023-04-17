@@ -38,7 +38,7 @@
 		if (agreement < 0.2) return '🫠';
 		if (agreement < 0.5) return '🙁';
 		if (agreement < 0.7) return '😐';
-		if (agreement < 0.9) return '😐';
+		if (agreement < 0.9) return '😃';
 		return '🤩';
 	}
 </script>
