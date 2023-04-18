@@ -6,7 +6,7 @@ processes = []
 [env]
 
 [build]
-  image = "ghcr.io/muchobien/pocketbase:0.13"
+  image = "ghcr.io/muchobien/pocketbase:0.15"
 
 [mounts]
   source = "pb_data"
