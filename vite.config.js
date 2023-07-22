@@ -1,6 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from "@sentry/sveltekit";
-import legacy from '@vitejs/plugin-legacy'
 
 /** @type {import('vite').UserConfig} */
 const config = {
@@ -17,9 +16,6 @@ const config = {
         rewrite: false,
       },
     }),
-		legacy(
-			{polyfills: ['es.array.at']}
-		),
 		sveltekit()
 	],
 

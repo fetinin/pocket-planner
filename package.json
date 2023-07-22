@@ -16,10 +16,10 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.36.1",
+		"@sveltejs/adapter-auto": "^2.1.0",
 		"@sveltejs/kit": "^1.22.3",
 		"@typescript-eslint/eslint-plugin": "^6.1.0",
 		"@typescript-eslint/parser": "^6.1.0",
-		"@vitejs/plugin-legacy": "^4.1.1",
 		"eslint": "^8.45.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-svelte3": "^4.0.0",
@@ -37,6 +37,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sentry/node": "^7.60.0",
 		"@sentry/svelte": "^7.60.0",
 		"@sentry/sveltekit": "^7.60.0",
 		"@sentry/tracing": "^7.60.0",
