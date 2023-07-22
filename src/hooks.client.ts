@@ -1,18 +1,21 @@
+import { handleErrorWithSentry, Replay } from "@sentry/sveltekit";
 import * as Sentry from '@sentry/sveltekit';
 
-import type { HandleClientError } from '@sveltejs/kit';
-
 Sentry.init({
-	dsn: 'https://9499d6f0d9204e50ab3e46b133a53e4f@o4504547848224769.ingest.sentry.io/4504818857869312',
-	tracesSampleRate: 1.0,
-	// For instance, initialize Session Replay:
-	replaysSessionSampleRate: 0.1,
-	replaysOnErrorSampleRate: 1.0,
-	integrations: [new Sentry.Replay()]
+  dsn: 'https://0bef3b0fd44c4002a1cdb3e033e64d4a@o4504547848224769.ingest.sentry.io/4504818857869312',
+  tracesSampleRate: 1.0,
+
+  // This sets the sample rate to be 10%. You may want this to be 100% while
+  // in development and sample at a lower rate in production
+  replaysSessionSampleRate: 0.1,
+
+  // If the entire session is not sampled, use the below sample rate to sample
+  // sessions when an error occurs.
+  replaysOnErrorSampleRate: 1.0,
+  
+  // If you don't want to use Session Replay, just remove the line below:
+  integrations: [new Replay()],
 });
 
-export const myErrorHandler: HandleClientError = ({ error, event }) => {
-	console.error('An error occurred on the client side:', error, event);
-};
-
-export const handleError = Sentry.handleErrorWithSentry(myErrorHandler);
+// If you have a custom error handler, pass it to `handleErrorWithSentry`
+export const handleError = handleErrorWithSentry();

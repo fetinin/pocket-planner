@@ -68,11 +68,11 @@ export type VotersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
-export type RoomsResponse<Texpand = unknown> = RoomsRecord & BaseSystemFields<Texpand>
-export type RoomsTasksResponse<Tvote_by_role = unknown, Texpand = unknown> = RoomsTasksRecord<Tvote_by_role> & BaseSystemFields<Texpand>
-export type RoomsVotersResponse<Texpand = unknown> = RoomsVotersRecord & BaseSystemFields<Texpand>
-export type UsersResponse = UsersRecord & AuthSystemFields
-export type VotersResponse = VotersRecord & BaseSystemFields
+export type RoomsResponse<Texpand = unknown> = Required<RoomsRecord> & BaseSystemFields<Texpand>
+export type RoomsTasksResponse<Tvote_by_role = unknown, Texpand = unknown> = Required<RoomsTasksRecord<Tvote_by_role>> & BaseSystemFields<Texpand>
+export type RoomsVotersResponse<Texpand = unknown> = Required<RoomsVotersRecord> & BaseSystemFields<Texpand>
+export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type VotersResponse<Texpand = unknown> = Required<VotersRecord> & BaseSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 

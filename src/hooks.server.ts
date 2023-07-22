@@ -1,14 +1,14 @@
+import { sequence } from "@sveltejs/kit/hooks";
+import { handleErrorWithSentry, sentryHandle } from "@sentry/sveltekit";
 import * as Sentry from '@sentry/sveltekit';
 
-import type { HandleServerError } from '@sveltejs/kit';
-
 Sentry.init({
-	dsn: 'https://73b9898f2f204c3686f16b2651838fa7@o4504547848224769.ingest.sentry.io/4504819016925184',
-	tracesSampleRate: 1.0
+  dsn: 'https://0bef3b0fd44c4002a1cdb3e033e64d4a@o4504547848224769.ingest.sentry.io/4504818857869312',
+  tracesSampleRate: 1.0,
 });
 
-const myErrorHandler: HandleServerError = ({ error, event }) => {
-	console.error('An error occurred on the server side:', error, event);
-};
+// If you have custom handlers, make sure to place them after `sentryHandle()` in the `sequence` function.
+export const handle = sequence(sentryHandle());
 
-export const handleError = Sentry.handleErrorWithSentry(myErrorHandler);
+// If you have a custom error handler, pass it to `handleErrorWithSentry`
+export const handleError = handleErrorWithSentry();

@@ -10,3 +10,9 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .cloudflare
 .vercel
+
+# Sentry
+.sentryclirc
+
+# Sentry
+.sentryclirc
