@@ -215,13 +215,14 @@
 			<div class="columns">
 				<div class="column">
 					{#if !currentTask || currentTask?.vote}
-						<form action="?/addTask" method="POST" use:enhance on:keypress={submitOnAltEnter}>
+						<form action="?/addTask" method="POST" use:enhance>
 							<input type="hidden" name="room_id" value={data.room.id} />
 							<textarea
 								class="textarea"
 								name="content"
 								id="content"
 								placeholder="e.g. Add new shopping cart handler"
+								on:keypress={submitOnAltEnter}
 							/>
 							{#if form?.addTask?.error?.description}<p class="has-text-danger">
 									Enter task description
