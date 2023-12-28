@@ -33,7 +33,7 @@
 			<div class="media-left">
 				<figure class="image is-48x48">
 					<img
-						src="https://avatars.dicebear.com/api/personas/{nickname}.svg?size=60"
+						src="https://api.dicebear.com/7.x/personas/svg?size=60&seed={nickname}"
 						alt="{nickname} icon"
 					/>
 				</figure>
